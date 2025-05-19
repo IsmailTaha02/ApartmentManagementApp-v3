@@ -1,0 +1,171 @@
+<app-maintenance-topbar></app-maintenance-topbar>
+<div class="maintenance-center-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="modern-header-card">
+      <div class="modern-header-content">
+        <div class="modern-header-text">
+          <h1 class="modern-page-title">
+            <span class="title-gradient">Maintenance Hub</span>
+          </h1>
+          <p class="modern-page-subtitle">
+            Streamline your property maintenance with our intuitive management system
+          </p>
+        </div>
+        <div class="modern-header-decoration">
+          <div class="decoration-circle"></div>
+          <div class="decoration-wave"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Filter Controls -->
+  <div class="filter-container">
+  <mat-form-field>
+      <mat-label>Status</mat-label>
+      <mat-select [ngModel]="statusFilter()" (ngModelChange)="statusFilter.set($event); onFilterChange()">
+        <mat-option *ngFor="let status of statusOptions" [value]="status">
+          {{ status }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Priority</mat-label>
+      <mat-select [ngModel]="priorityFilter()" (ngModelChange)="priorityFilter.set($event); onFilterChange()">
+        <mat-option *ngFor="let priority of priorityOptions" [value]="priority">
+          {{ priority }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Problem Type</mat-label>
+      <mat-select [ngModel]="problemTypeFilter()" (ngModelChange)="problemTypeFilter.set($event); onFilterChange()">
+        <mat-option *ngFor="let type of problemTypeOptions" [value]="type">
+          {{ type }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" class="custom-reset-btn" (click)="resetFilters()">
+      Reset Filters
+    </button>
+    
+  </div>
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="loading-state">
+      <mat-spinner diameter="50"></mat-spinner>
+      <p>Loading your maintenance requests...</p>
+    </div>
+  }
+
+  <!-- Error State -->
+  @else if (error()) {
+    <mat-card class="error-card">
+      <mat-card-content>
+        <div class="error-content">
+          <h3>Couldn't load requests</h3>
+          <p>{{ error() }}</p>
+          <button mat-stroked-button color="primary" (click)="refreshRequests()">
+            Try Again
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  <!-- Empty State -->
+  @else if (filteredRequests().length === 0) {
+    <mat-card class="empty-state-card">
+      <mat-card-content>
+        <div class="empty-state-content">
+          <h3>No Matching Maintenance Requests</h3>
+          <p>No requests match your current filters. Try adjusting your filters or create a new request.</p>
+          <div class="empty-state-actions">
+            <button mat-stroked-button (click)="resetFilters()">
+              Reset Filters
+            </button>
+            <button mat-raised-button color="primary" (click)="goToNewRequest()">
+              Create Request
+            </button>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  <!-- Requests List -->
+  @else {
+    <div class="requests-container">
+      <h2 class="requests-title">
+        Your Maintenance Requests ({{ filteredRequests().length }} of {{ maintenanceRequests().length }})
+        <button mat-icon-button (click)="refreshRequests()" matTooltip="Refresh requests">
+          Refresh
+        </button>
+      </h2>
+
+      <div class="requests-grid">
+        @for (request of filteredRequests(); track request.id) {
+          <mat-card 
+            class="request-card"
+            [class]="getStatusClass(request.status)"
+            tabindex="0"
+          >
+            <div class="request-card-header">
+              <div class="request-title">
+                {{ request.problemType | titlecase }}
+              </div>
+              <div class="status-badge">{{ request.status | titlecase }}</div>
+            </div>
+
+            <div class="request-meta">
+              <div class="info-row">
+                <span class="label">Apartment:</span>
+                <span class="value">{{ request.apartmentNumber }}</span>
+              </div>
+              <div class="info-row">
+                <span class="label">Created:</span>
+                <span class="value">{{ request.createdAt | date }}</span>
+              </div>
+              <div class="info-row">
+                <span class="label">Priority:</span>
+                <span class="value priority" [ngClass]="getPriorityClass(request.priority)">
+                  {{ request.priority | titlecase }}
+                </span>
+              </div>
+            </div>
+
+            <p class="request-description">{{ request.description }}</p>
+
+            <div class="request-actions">
+              <button 
+                mat-stroked-button 
+                color="primary" 
+                (click)="viewRequestDetails(request)"
+                class="view-btn"
+                [attr.aria-label]="'View details for ' + request.problemType + ' request'"
+              >
+                View Details
+              </button>
+            </div>
+          </mat-card>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Floating Action Button (global, bottom right) -->
+  <button
+    mat-fab
+    color="primary"
+    class="fab-add-button pulse"
+    aria-label="Create Maintenance Request"
+    matTooltip="Create New Request"
+    (click)="goToNewRequest()"
+  >
+    Create
+  </button>
+</div>

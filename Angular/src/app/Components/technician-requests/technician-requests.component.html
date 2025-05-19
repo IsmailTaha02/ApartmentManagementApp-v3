@@ -1,0 +1,104 @@
+<app-maintenance-topbar></app-maintenance-topbar>
+<div class="tech-dashboard-container">
+  <h2 class="dashboard-title">🛠️ My Assigned Maintenance Requests</h2>
+
+  <div class="dashboard-controls">
+    <input
+      type="text"
+      placeholder="🔍 Search by problem type or description..."
+      (input)="onSearchChange($event)"
+      class="search-bar"
+    />
+
+    <select (change)="onFilterChange($event)" class="filter-dropdown">
+      <option value="All">All Statuses</option>
+      <option value="Approved">Approved</option>
+      <option value="In Progress">In Progress</option>
+      <option value="Completed">Completed</option>
+      <option value="Rejected">Rejected</option>
+    </select>
+  </div>
+
+  <div *ngIf="loading()" class="loading-box">
+    <p>⏳ Loading requests...</p>
+  </div>
+
+  <div *ngIf="error()" class="error-box">
+    <p>⚠️ {{ error() }}</p>
+  </div>
+
+  <div *ngIf="!loading() && !error() && filteredRequests().length === 0" class="no-data">
+    <p>🙅‍♂️ No matching requests found.</p>
+  </div>
+
+  <div class="requests-grid">
+    <div class="request-card" *ngFor="let req of filteredRequests()">
+      <div class="card-header">
+        <div class="card-title-group">
+          <span class="card-title">🔧 {{ req.problem_type }}</span>
+          <span class="card-id">#{{ req.id }}</span>
+        </div>
+        <span class="status-badge"
+          [ngClass]="{
+            'status-completed': req.status === 'Completed',
+            'status-in-progress': req.status === 'In Progress',
+            'status-approved': req.status === 'Approved',
+            'status-rejected': req.status === 'Rejected'
+          }">
+          {{ req.status }}
+        </span>
+      </div>
+
+      <div class="card-meta">
+        <div class="meta-item">
+          <i class="fas fa-calendar-alt"></i>
+          Created: {{ req.request_date | date:'mediumDate' }}
+        </div>
+        <div class="meta-item" *ngIf="req.scheduled_date">
+          <i class="fas fa-clock"></i>
+          Scheduled: {{ req.scheduled_date | date:'mediumDate' }} at {{ req.scheduled_date | date:'shortTime' }}
+        </div>
+      </div>
+
+      <div class="card-description">
+        <p><strong>Description:</strong> {{ req.description }}</p>
+      </div>
+
+      <div class="card-actions">
+        <div class="action-control">
+          <label>Status:</label>
+          <select 
+            [(ngModel)]="req.status" 
+            class="status-select"
+            (change)="onFieldChange(req.id)"
+          >
+            <option value="Approved">Approved</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Completed">Completed</option>
+            <option value="Rejected">Rejected</option>
+          </select>
+        </div>
+
+        <div class="action-control">
+          <label>Schedule Date & Time:</label>
+          <input 
+            type="datetime-local" 
+            [value]="formatDateForInput(req.scheduled_date)"
+            (change)="onDateChange(req, $event)"
+            class="date-picker"
+            [min]="today + 'T00:00'"
+          />
+        </div>
+
+        <button 
+          (click)="updateRequest(req)" 
+          class="save-button"
+          [disabled]="!editedRequestIds.has(req.id)"
+          [ngClass]="{'button-disabled': !editedRequestIds.has(req.id)}"
+        >
+          💾 Save Changes
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

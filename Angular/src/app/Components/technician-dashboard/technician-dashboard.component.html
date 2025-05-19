@@ -1,0 +1,91 @@
+<div class="dashboard-container">
+  <nav class="sidebar">
+    <img routerLink="/home-page" src="app-logo.png" alt="App Logo" class="app-logo">
+    <hr>
+    
+    <div class="profile-section">
+      <img [src]="technicianAvatar()" alt="Technician Avatar" class="avatar">
+      <h3>{{ technicianName() }}</h3>
+      <p class="role-badge">Technician</p>
+    </div>
+    <hr>
+    
+    <ul>
+      <li>
+        <a routerLink="/technician-dashboard/requests" routerLinkActive="active">
+          <i class="fas fa-clipboard-list nav-icon"></i>
+          <span class="nav-text">My Requests</span>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/technician-dashboard/assignments" routerLinkActive="active">
+          <i class="fas fa-tasks nav-icon"></i>
+          <span class="nav-text">Assignments</span>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/technician-dashboard/schedule" routerLinkActive="active">
+          <i class="fas fa-calendar-alt nav-icon"></i>
+          <span class="nav-text">Schedule</span>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/technician-dashboard/customer-payments" routerLinkActive="active">
+          <i class="fas fa-calendar-alt nav-icon"></i>
+          <span class="nav-text">Payments</span>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/technician-dashboard/profile" routerLinkActive="active">
+          <i class="fas fa-user-cog nav-icon"></i>
+          <span class="nav-text">Profile</span>
+        </a>
+      </li>
+    </ul>
+    <hr>
+    
+    <ul>
+      <li>
+        <a (click)="logout()" class="logout-link">
+          <i class="fas fa-sign-out-alt nav-icon"></i>
+          <span class="nav-text">Logout</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <main class="main-content">
+    <div class="stats-bar">
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-clipboard-list"></i>
+        </div>
+        <div class="stat-info">
+          <h4>Total Requests</h4>
+          <p>{{ totalRequests() }}</p>
+        </div>
+      </div>
+      <div class="stat-card pending">
+        <div class="stat-icon">
+          <i class="fas fa-hourglass-half"></i>
+        </div>
+        <div class="stat-info">
+          <h4>Pending</h4>
+          <p>{{ pendingRequests() }}</p>
+        </div>
+      </div>
+      <div class="stat-card completed">
+        <div class="stat-icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="stat-info">
+          <h4>Completed</h4>
+          <p>{{ completedRequests() }}</p>
+        </div>
+      </div>
+    </div>
+    
+    <router-outlet></router-outlet>
+  </main>
+  
+</div>

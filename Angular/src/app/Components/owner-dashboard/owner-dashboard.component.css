@@ -1,0 +1,62 @@
+.sidebar {
+    width: 220px;
+    height: 100vh;
+    background-color: #0a1d3f;
+    color: white;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding-top: 20px;
+    font-family: 'Segoe UI', sans-serif;
+    text-align: center;
+  
+    .app-logo {
+      height: 35px;
+      width: 35px;
+      margin-bottom: 5px;
+      cursor: pointer;
+    }
+  
+    hr {    
+      border: none;
+      height: 1px;
+      background-color: #76777e;
+      margin: 10px 0;
+    }
+  
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+  
+      li {
+        margin: 15px 0;
+  
+        a {
+          color: white;
+          text-decoration: none;
+          padding: 10px 20px;
+          display: flex;
+          align-items: center;
+          justify-content: flex-start;
+  
+          &:hover {
+            background-color: #142b53;
+            border-left: 4px solid #ffc107;
+          }
+  
+          .nav-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+          }
+        }
+      }
+    }
+  }
+
+  .dashboard-content{
+    margin-left: 220px;
+    margin-top: 50px;
+  }
+  

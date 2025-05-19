@@ -1,0 +1,148 @@
+<!-- Assignment Details -->
+<div *ngIf="assignment() && !loading()" class="detailed-card">
+    <!-- Header with problem type -->
+    <div class="detailed-header" [ngClass]="getHeaderClass(assignment()?.problem_type)">
+      <i [ngClass]="getIcon(assignment()?.problem_type)" aria-hidden="true"></i>
+      <h1>{{ assignment()?.problem_type }} Request</h1>
+      <span class="status-badge">{{ assignment()?.status }}</span>
+    </div>
+  
+    <!-- Main Content -->
+    <div class="detailed-content">
+      <div class="row">
+        <div class="col-md-6">
+          <section class="detail-section">
+            <h2><i class="fas fa-info-circle me-2"></i>Problem Details</h2>
+            <p>{{ assignment()?.description }}</p>
+  
+            <div class="detail-item">
+              <i class="fas fa-calendar-alt me-2"></i>
+              <strong>Request Date:</strong> 
+              {{ assignment()?.request_date | date:'fullDate' }}
+            </div>
+  
+            <div class="detail-item">
+              <i class="fas fa-clock me-2"></i>
+              <strong>Priority:</strong> 
+              <span class="priority-badge">{{ assignment()?.priority || 'Normal' }}</span>
+            </div>
+  
+            <!-- Images if available -->
+            <div class="detail-item" *ngIf="assignment()?.images">
+              <i class="fas fa-image me-2"></i>
+              <strong>Images:</strong>
+              <div class="request-images">
+                <img [src]="assignment()?.images" alt="Request image" class="img-thumbnail">
+              </div>
+            </div>
+          </section>
+        </div>
+  
+        <div class="col-md-6">
+          <section class="detail-section">
+            <h2><i class="fas fa-user me-2"></i>Tenant Information</h2>
+  
+            <div class="detail-item">
+              <i class="fas fa-user me-2"></i>
+              <strong>Name:</strong> {{ assignment()?.user?.name || 'N/A' }}
+            </div>
+  
+            <div class="detail-item">
+              <i class="fas fa-phone me-2"></i>
+              <strong>Phone:</strong> 
+              <a *ngIf="assignment()?.user?.phone" href="tel:{{assignment()?.user?.phone}}">
+                {{ assignment()?.user?.phone }}
+              </a>
+              <span *ngIf="!assignment()?.user?.phone">N/A</span>
+            </div>
+  
+            <div class="detail-item">
+              <i class="fas fa-envelope me-2"></i>
+              <strong>Email:</strong> 
+              <a *ngIf="assignment()?.user?.email" href="mailto:{{assignment()?.user?.email}}">
+                {{ assignment()?.user?.email }}
+              </a>
+              <span *ngIf="!assignment()?.user?.email">N/A</span>
+            </div>
+  
+            <div class="detail-item">
+              <i class="fas fa-home me-2"></i>
+              <strong>Apartment:</strong> 
+              {{ assignment()?.apartment?.unit_number || 'N/A' }}
+            </div>
+          </section>
+  
+          <!-- Technician Info if available -->
+          <section class="detail-section" *ngIf="assignment()?.technician">
+            <h2><i class="fas fa-tools me-2"></i>Assigned Technician</h2>
+            <div class="detail-item">
+              <i class="fas fa-user me-2"></i>
+              <strong>Name:</strong> {{ assignment()?.technician?.name || 'N/A' }}
+            </div>
+            <div class="detail-item">
+              <i class="fas fa-phone me-2"></i>
+              <strong>Phone:</strong> 
+              <a *ngIf="assignment()?.technician?.phone" href="tel:{{assignment()?.technician?.phone}}">
+                {{ assignment()?.technician?.phone }}
+              </a>
+              <span *ngIf="!assignment()?.technician?.phone">N/A</span>
+            </div>
+          </section>
+        </div>
+      </div>
+  
+      <!-- Additional Notes Section -->
+      <section class="detail-section" *ngIf="assignment()?.notes">
+        <h2><i class="fas fa-sticky-note me-2"></i>Additional Notes</h2>
+        <p>{{ assignment()?.notes }}</p>
+      </section>
+  
+      <!-- Response Section -->
+      <section class="detail-section" *ngIf="assignment()?.response">
+        <h2><i class="fas fa-comment me-2"></i>Technician Response</h2>
+        <p>{{ assignment()?.response }}</p>
+      </section>
+  
+      <!-- Action Buttons (only show for pending requests) -->
+      <div class="action-buttons" *ngIf="assignment()?.status === 'Pending'">
+        <button (click)="respondToRequest(assignment()?.id, 'Accepted', $event)" 
+                class="btn btn-success btn-accept">
+          <i class="fas fa-check-circle me-2"></i>
+          Accept Assignment
+        </button>
+        <button (click)="respondToRequest(assignment()?.id, 'Rejected', $event)" 
+                class="btn btn-outline-danger btn-reject">
+          <i class="fas fa-times-circle me-2"></i>
+          Reject Assignment
+        </button>
+      </div>
+  
+      <!-- Back button -->
+      <div class="text-center mt-4">
+        <button (click)="goBack()" class="btn btn-secondary">
+          <i class="fas fa-arrow-left me-2"></i>
+          Back to Dashboard
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Loading State -->
+  <div *ngIf="loading()" class="loading-state">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p>Loading assignment details...</p>
+  </div>
+  
+  <!-- Error State -->
+  <div *ngIf="error() && !loading()" class="error-state">
+    <div class="alert alert-danger">
+      <i class="fas fa-exclamation-triangle me-2"></i>
+      {{ error() }}
+    </div>
+    <button (click)="goBack()" class="btn btn-secondary">
+      <i class="fas fa-arrow-left me-2"></i>
+      Back to Dashboard
+    </button>
+  </div>

@@ -1,0 +1,13 @@
+<header class="header-banner">
+  <div routerLink="/home-page" class="logo-container">
+    <img src="app-logo.png" alt="App Logo" class="app-logo">
+    <h1 class="app-name">AppManagementPlatform</h1>
+  </div>
+
+  <!-- Auth Buttons moved to header -->
+  <div class="auth-buttons">
+    <!-- Only show the login button if the current route is not 'login' -->
+    <button *ngIf="!hideLoginButton" routerLink="/login" class="login-btn">Login</button>
+    <button class="signup-btn">Sign Up</button>
+  </div>
+</header>

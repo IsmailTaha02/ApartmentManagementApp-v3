@@ -1,0 +1,54 @@
+<!-- <app-sidebar></app-sidebar> -->
+<app-apartment-topbar></app-apartment-topbar>
+
+<div class="customer-apartments-wrapper">
+  <!-- Tabs Navigation -->
+  <div class="tabs">
+    <button [class.active]="activeTab === 'mine'" (click)="activeTab = 'mine'">🏠 My Apartments</button>
+    <button [class.active]="activeTab === 'explore'" (click)="activeTab = 'explore'">🔍 Explore Apartments</button>
+  </div>
+
+  <!-- My Apartments Section -->
+  <div *ngIf="activeTab === 'mine'" class="tab-content">
+    <h3>My Rented / Purchased Apartments</h3>
+    <div class="apartment-grid">
+      <div class="apartment-card" *ngFor="let apt of myApartments">
+        <img [src]="apt.photos?.[0] || 'assets/default-image.jpg'" class="card-img" />
+        <h4>{{ apt.location }} ({{ apt.unit_number }})</h4>
+        <p><strong>Area:</strong> {{ apt.area }} m²</p>
+        <p><strong>Rooms:</strong> {{ apt.number_of_rooms }}</p>
+        <p><strong>Status:</strong> {{ apt.status }}</p>
+        <button class="contract-btn">View Contract</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Explore Apartments Section -->
+  <div *ngIf="activeTab === 'explore'" class="tab-content">
+    <h3>Find New Apartments</h3>
+    <div class="filter-panel">
+      <select [(ngModel)]="typeFilter">
+        <option value="">All Types</option>
+        <option value="For Sale">For Sale</option>
+        <option value="For Rent">For Rent</option>
+      </select>
+      <input type="text" [(ngModel)]="locationFilter" placeholder="Location" />
+      <input type="number" [(ngModel)]="minPrice" placeholder="Min Price" />
+      <input type="number" [(ngModel)]="maxPrice" placeholder="Max Price" />
+      <input type="number" [(ngModel)]="minArea" placeholder="Min Area" />
+      <input type="number" [(ngModel)]="maxArea" placeholder="Max Area" />
+      <button (click)="applySearchFilters()">Search</button>
+    </div>
+
+    <div class="apartment-grid">
+      <div class="apartment-card" *ngFor="let apt of searchResults">
+        <img [src]="apt.photos?.[0] || 'assets/default-image.jpg'" class="card-img" />
+        <h4>{{ apt.location }} ({{ apt.unit_number }})</h4>
+        <p><strong>Type:</strong> {{ apt.type }}</p>
+        <p><strong>Area:</strong> {{ apt.area }} m²</p>
+        <p><strong>Price:</strong> ${{ apt.price }}</p>
+        <button class="contact-btn">Contact Owner</button>
+      </div>
+    </div>
+  </div>
+</div>

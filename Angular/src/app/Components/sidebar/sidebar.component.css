@@ -1,0 +1,114 @@
+.detail-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  color: var(--light-text);
+}
+
+.back-button {
+  margin-bottom: 1.5rem;
+  color: var(--accent-yellow);
+  font-weight: bold;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.back-button:hover {
+  color: #e0ac00;
+}
+
+.detail-card {
+  background-color: var(--dark-hover);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.3);
+  transition: var(--transition);
+}
+
+.detail-icon {
+  vertical-align: middle;
+  margin-right: 0.5rem;
+  font-size: 2rem;
+  width: 2rem;
+  height: 2rem;
+  color: var(--accent-yellow);
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+.detail-section {
+  padding: 1rem;
+  background-color: var(--input-bg);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  transition: var(--transition);
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+.status-display {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  display: inline-block;
+  font-weight: bold;
+  background-color: var(--accent-yellow);
+  color: var(--primary-dark);
+  transition: var(--transition);
+}
+
+.priority-badge {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  display: inline-block;
+  font-weight: bold;
+  transition: var(--transition);
+}
+
+.priority-badge.low {
+  background-color: #2e7d32;
+  color: #e8f5e9;
+}
+
+.priority-badge.medium {
+  background-color: #ff8f00;
+  color: #fff8e1;
+}
+
+.priority-badge.high {
+  background-color: #c62828;
+  color: #ffebee;
+}
+
+.description-text {
+  white-space: pre-line;
+  line-height: 1.6;
+  opacity: 0.95;
+}
+
+.response-section {
+  background-color: #263a6a;
+  border-left: 4px solid var(--accent-yellow);
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.response-text {
+  font-style: italic;
+  white-space: pre-line;
+  color: var(--light-text);
+  opacity: 0.9;
+}
+
+.technician-info {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: #bbb;
+}

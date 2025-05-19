@@ -1,0 +1,77 @@
+<app-payments-topbar></app-payments-topbar>>
+<!-- <app-sidebar></app-sidebar> -->
+
+<div class="admin-payments">
+
+    <div class="filter-bar">
+        <!-- Status Filter -->
+        <select [(ngModel)]="statusFilter" (change)="applyFilter()">
+          <option value="All">All Statuses</option>
+          <option value="Due">Due</option>
+          <option value="Overdue">Overdue</option>
+          <option value="Completed">Completed</option>
+        </select>
+      
+        <ng-select
+            [items]="users"
+            bindLabel="full_name"
+            bindValue="id"
+            [(ngModel)]="userFilter"
+            (change)="applyFilter()"
+            placeholder="Select or search user"
+            [searchable]="true">
+        </ng-select>
+
+        <ng-select
+            [items]="apartments"
+            bindLabel="location"
+            bindValue="id"
+            [(ngModel)]="apartmentFilter"
+            (change)="applyFilter()"
+            placeholder="Select or search apartment"
+            [searchable]="true">
+        </ng-select>
+
+        <ng-select
+          [items]="monthOptions"
+          [(ngModel)]="monthFilter"
+          (change)="applyFilter()"
+          placeholder="Select Month"
+          [searchable]="true">
+        </ng-select>
+
+      </div>
+      
+      
+    <h2>📋 </h2>
+  
+    <table class="payments-table">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Apartment Location</th>
+          <th>Amount</th>
+          <th>Due Date</th>
+          <th>Paid Date</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let p of filteredPayments">
+          <td>{{ p.user?.full_name }}</td>
+          <td>{{ p.apartment.location }}</td>
+          <td>${{ p.amount }}</td>
+          <td>{{ p.due_date | date }}</td>
+          <td>{{ p.paid_date ? (p.paid_date | date) : '—' }}</td>
+          <td>
+            <span [class]="p.status.toLowerCase()">{{ p.status }}</span>
+          </td>
+          <td>
+            <button class="view-btn">Details</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  

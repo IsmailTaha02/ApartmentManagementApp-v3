@@ -1,0 +1,210 @@
+<app-maintenance-topbar></app-maintenance-topbar>
+
+<div class="container mt-4 position-relative">
+  <h1 class="mb-4" [attr.aria-live]="'polite'">🛠️ New Maintenance Assignments</h1>
+
+  <!-- Filter Bar -->
+  <div class="filter-bar shadow-sm p-3 mb-4 bg-light rounded" [attr.aria-label]="'Assignment filters'">
+    <div class="d-flex flex-wrap align-items-center gap-3">
+      
+      <!-- Problem Type Filter -->
+      <div class="flex-grow-1">
+        <label for="problemTypeFilter" class="form-label">Problem Type</label>
+        <select 
+          id="problemTypeFilter"
+          [(ngModel)]="filters().problemType"
+          (ngModelChange)="updateFilter('problemType', $event)"
+          class="form-select"
+          [attr.aria-label]="'Filter by problem type'">
+          <option value="">All Types</option>
+          @for (type of uniqueProblemTypes; track type) {
+            <option [value]="type">{{ type }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Priority Filter -->
+      <div class="flex-grow-1">
+        <label for="priorityFilter" class="form-label">Priority</label>
+        <select 
+          id="priorityFilter"
+          [(ngModel)]="filters().priority"
+          (ngModelChange)="updateFilter('priority', $event)"
+          class="form-select"
+          [attr.aria-label]="'Filter by priority'">
+          <option value="">All Priorities</option>
+          @for (priority of uniquePriorities; track priority) {
+            <option [value]="priority">{{ priority }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Date Range Filter -->
+      <div class="flex-grow-1">
+        <label for="dateRangeFilter" class="form-label">Date Range</label>
+        <select 
+          id="dateRangeFilter"
+          [(ngModel)]="filters().dateRange"
+          (ngModelChange)="updateFilter('dateRange', $event)"
+          class="form-select"
+          [attr.aria-label]="'Filter by date range'">
+          <option value="">All Dates</option>
+          <option value="today">Today</option>
+          <option value="week">Last 7 Days</option>
+          <option value="month">Last 30 Days</option>
+        </select>
+      </div>
+
+      <!-- Search Filter -->
+      <div class="flex-grow-1">
+        <label for="searchFilter" class="form-label">Search</label>
+        <div class="input-group">
+          <input 
+            type="text" 
+            id="searchFilter"
+            [(ngModel)]="filters().searchTerm"
+            (ngModelChange)="updateFilter('searchTerm', $event)"
+            class="form-control"
+            placeholder="Search..."
+            [attr.aria-label]="'Search assignments'">
+          <button 
+            class="btn btn-outline-secondary" 
+            type="button"
+            (click)="resetFilters()"
+            [attr.aria-label]="'Reset all filters'">
+            <i class="fas fa-undo"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Filters -->
+    <div class="mt-2" *ngIf="hasActiveFilters()">
+      <span class="badge bg-info me-2 mb-2" *ngIf="filters().problemType">
+        Type: {{ filters().problemType }}
+        <button class="btn-close btn-close-white btn-sm ms-1" (click)="updateFilter('problemType', '')" aria-label="Remove problem type filter"></button>
+      </span>
+      <span class="badge bg-info me-2 mb-2" *ngIf="filters().priority">
+        Priority: {{ filters().priority }}
+        <button class="btn-close btn-close-white btn-sm ms-1" (click)="updateFilter('priority', '')" aria-label="Remove priority filter"></button>
+      </span>
+      <span class="badge bg-info me-2 mb-2" *ngIf="filters().dateRange">
+        Date: {{ getDateRangeLabel(filters().dateRange) }}
+        <button class="btn-close btn-close-white btn-sm ms-1" (click)="updateFilter('dateRange', '')" aria-label="Remove date range filter"></button>
+      </span>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  @if (loading()) {
+    <div class="alert alert-info d-flex align-items-center mt-5"
+         [attr.aria-busy]="'true'"
+         [attr.aria-live]="'polite'">
+      <div class="spinner-border me-2" aria-hidden="true"></div>
+      <span>Loading assignments...</span>
+    </div>
+  }
+
+  <!-- Error -->
+  @if (error()) {
+    <div class="alert alert-danger mt-5" role="alert" [attr.aria-live]="'assertive'">
+      <i class="fas fa-exclamation-circle me-2" aria-hidden="true"></i>
+      {{ error() }}
+      <button class="btn btn-sm btn-outline-danger ms-3" (click)="loadAssignments()">Retry</button>
+    </div>
+  }
+
+  <!-- No Results -->
+  @if (!loading() && !error() && filteredAssignments.length === 0) {
+    <div class="alert alert-success mt-5" [attr.aria-live]="'polite'">
+      <i class="fas fa-check-circle me-2" aria-hidden="true"></i>
+      @if (hasActiveFilters()) {
+        No assignments match your filters. <a href="javascript:void(0)" (click)="resetFilters()">Clear filters</a>.
+      } @else {
+        🎉 All caught up! No pending assignments.
+      }
+    </div>
+  }
+
+  <!-- Assignment Cards -->
+  @if (!loading() && !error() && filteredAssignments.length > 0) {
+    <div class="mt-4" [attr.aria-live]="'polite'">
+      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        @for (assignment of filteredAssignments; track assignment.id) {
+          <div class="col">
+            <div class="card h-100 assignment-card"
+                 [ngClass]="getCardClass(assignment.problem_type)"
+                 (click)="viewDetails(assignment.id)"
+                 [attr.aria-labelledby]="'assignment-' + assignment.id + '-title'"
+                 role="article">
+  
+              <!-- Header -->
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                  <i [class]="getIcon(assignment.problem_type)" aria-hidden="true"></i>
+                  <span class="ms-2">{{ assignment.problem_type }}</span>
+                </div>
+                <span *ngIf="assignment.priority" class="badge" [ngClass]="{
+                  'bg-danger': assignment.priority === 'High',
+                  'bg-warning text-dark': assignment.priority === 'Medium',
+                  'bg-success': assignment.priority === 'Low'
+                }">
+                  {{ assignment.priority }}
+                </span>
+              </div>
+  
+              <!-- Body -->
+              <div class="card-body">
+                <h3 class="card-title h5" [id]="'assignment-' + assignment.id + '-title'">
+                  Apartment #{{ assignment.apartment_id }}
+                </h3>
+                <p class="card-text">{{ truncateText(assignment.description, 100) }}</p>
+                <div class="assignment-details">
+                  <div class="detail-item">
+                    <i class="fas fa-user me-2"></i>
+                    <strong>Tenant:</strong> {{ assignment.user?.name || 'N/A' }}
+                  </div>
+                  <div class="detail-item">
+                    <i class="fas fa-phone me-2"></i>
+                    <strong>Contact:</strong> {{ assignment.user?.phone || 'N/A' }}
+                  </div>
+                  <div class="detail-item">
+                    <i class="far fa-calendar me-2"></i>
+                    <strong>Requested:</strong> {{ assignment.request_date | date:'shortDate' }}
+                  </div>
+                </div>
+              </div>
+  
+              <!-- Footer -->
+              <div class="card-footer bg-transparent border-top-0">
+                <div class="d-grid gap-2">
+                  <button 
+                    (click)="respondToRequest(assignment.id, 'Accepted', $event)" 
+                    class="btn btn-accept"
+                    [disabled]="isProcessing(assignment.id)">
+                    @if (isProcessing(assignment.id)) {
+                      <span class="spinner-border spinner-border-sm me-2"></span>
+                    } @else {
+                      <i class="fas fa-check-circle me-2"></i>
+                    }
+                    Accept
+                  </button>
+                  
+                  <button 
+                    (click)="respondToRequest(assignment.id, 'Rejected', $event)" 
+                    class="btn btn-reject"
+                    [disabled]="isProcessing(assignment.id)">
+                    <i class="fas fa-times-circle me-2"></i>
+                    Reject
+                  </button>
+                </div>
+              </div>
+  
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+  
+</div>

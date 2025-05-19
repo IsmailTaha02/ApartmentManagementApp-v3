@@ -1,0 +1,73 @@
+<app-header></app-header>
+
+<h2 class="header-text">Search for apartment to Buy based on your requirements</h2>
+
+<!-- Filter Section -->
+<div class="filter-bar">
+    <div class="filter">
+      <select id="priceMin" [(ngModel)]="filterPriceMin" (change)="applyFilters()">
+        <option [ngValue]="null">Min Price</option>
+        <option value="100">100</option>
+        <option value="500">500</option>
+        <option value="1000">1000</option>
+      </select>
+    </div>
+    
+    <div class="filter">
+      <select id="priceMax" [(ngModel)]="filterPriceMax" (change)="applyFilters()">
+        <option [ngValue]="null">Max Price</option>
+        <option value="1000">1000</option>
+        <option value="5000">5000</option>
+        <option value="10000">10000</option>
+      </select>
+    </div>
+  
+    <div class="filter">
+      <select id="location" [(ngModel)]="filterLocation" (change)="applyFilters()">
+        <option [ngValue]="null">Location</option>
+        <option value="Chicago">Chicago</option>
+        <option value="New York">New York</option>
+        <option value="Los Angeles">Los Angeles</option>
+      </select>
+    </div>
+  
+    <div class="filter">
+      <select id="areaMin" [(ngModel)]="filterAreaMin" (change)="applyFilters()">
+        <option [ngValue]="null">Min Area (sq ft)</option>
+        <option value="500">500</option>
+        <option value="1000">1,000</option>
+        <option value="1500">1,500</option>
+      </select>
+    </div>
+  
+    <div class="filter">
+      <select id="areaMax" [(ngModel)]="filterAreaMax" (change)="applyFilters()">
+        <option [ngValue]="null">Max Area (sq ft)</option>
+        <option value="1000">1,000</option>
+        <option value="2000">2,000</option>
+        <option value="3000">3,000</option>
+      </select>
+    </div>
+  </div>
+  
+  <!-- Apartment Listings Section -->
+  <div class="listing-section">
+    <h2>Available apartments for sale</h2>
+    <div class="card-container">
+      <div *ngFor="let apartment of apartments" class="card">
+       <div [routerLink]="['/apartment', apartment.id]" class="card-link">
+        <div class="card-image">
+          <img [src]="apartment.photos ? apartment.photos[0] : 'assets/default-image.jpg'"
+           alt="Apartment image" class="card-img">
+        </div>
+        <div class="card-body">
+          <h3>{{ apartment.location }}</h3>
+          <p>{{ apartment.price }}$</p>
+          <p>{{ apartment.number_of_rooms }} bds | {{ apartment.area }} sqft</p>
+          <button class="view-details-btn" [routerLink]="['/apartment', apartment.id]">View Details</button>
+        </div>
+       </div>
+      </div>
+    </div>
+  </div>
+  

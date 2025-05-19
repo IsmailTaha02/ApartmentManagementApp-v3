@@ -1,0 +1,39 @@
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
+/* Force full text rendering in buttons */
+.mat-mdc-button .mdc-button__label,
+.mat-mdc-raised-button .mdc-button__label,
+.mat-mdc-outlined-button .mdc-button__label {
+  overflow: visible !important;
+  text-overflow: clip !important;
+  white-space: nowrap !important;
+}
+
+.mat-icon {
+  margin-left: 4px !important;
+  margin-right: 4px !important;
+}
+
+.mat-mdc-form-field .mat-mdc-text-field-wrapper {
+  padding-right: 8px !important;
+}
+
+.mat-mdc-form-field .mat-mdc-form-field-icon-prefix,
+.mat-mdc-form-field .mat-mdc-form-field-icon-suffix {
+  padding: 0 4px !important;
+}
+
+/* Z-Index fixes for Angular Material Dialog */
+.cdk-overlay-container {
+  z-index: 10000 !important;
+}
+
+.cdk-overlay-backdrop {
+  z-index: 10001 !important;
+  background-color: rgba(0, 0, 0, 0.5) !important;
+}
+
+.cdk-global-overlay-wrapper,
+.cdk-overlay-pane {
+  z-index: 10002 !important;
+}

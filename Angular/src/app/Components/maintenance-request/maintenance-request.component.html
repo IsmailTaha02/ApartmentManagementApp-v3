@@ -1,0 +1,123 @@
+<!-- maintenance-request.component.html -->
+<div class="maintenance-container">
+  <div class="form-section">
+    <div class="form-content">
+
+      <!-- Stepper -->
+      <div class="steps-indicator">
+        <div class="step-wrapper" [class.active]="step === 1" [class.completed]="step > 1">
+          <div class="step">{{ step > 1 ? '✓' : '1' }}</div>
+          <div class="step-label">Personal</div>
+        </div>
+        <div class="step-wrapper" [class.active]="step === 2" [class.completed]="step > 2">
+          <div class="step">{{ step > 2 ? '✓' : '2' }}</div>
+          <div class="step-label">Details</div>
+        </div>
+        <div class="step-wrapper" [class.active]="step === 3">
+          <div class="step">3</div>
+          <div class="step-label">Upload</div>
+        </div>
+      </div>
+
+      <h2>Submit a Maintenance Request</h2>
+      <p class="subtitle">Please fill out the form below to submit your request</p>
+
+      <form [formGroup]="maintenanceForm" (ngSubmit)="submitRequest()">
+        <!-- Step 1: Personal Info -->
+        <div *ngIf="step === 1" class="form-step">
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Resident Name*</mat-label>
+            <input matInput formControlName="residentName" required>
+            <mat-error *ngIf="f['residentName'].invalid">This field is required</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Apartment Number*</mat-label>
+            <input matInput formControlName="apartmentNumber" required>
+            <mat-error *ngIf="f['apartmentNumber'].invalid">This field is required</mat-error>
+          </mat-form-field>
+
+          <div class="button-group">
+            <button mat-raised-button color="primary" type="button" 
+                    (click)="nextStep()" class="full-width-button"
+                    [disabled]="!f['residentName'].valid || !f['apartmentNumber'].valid">
+              Next
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 2: Request Details -->
+        <div *ngIf="step === 2" class="form-step">
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Category*</mat-label>
+            <mat-select formControlName="category" required>
+              <mat-option value="plumbing">Plumbing</mat-option>
+              <mat-option value="electrical">Electrical</mat-option>
+              <mat-option value="hvac">HVAC</mat-option>
+              <mat-option value="other">Other</mat-option>
+            </mat-select>
+            <mat-error *ngIf="f['category'].invalid">Please select a category</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Urgency Level*</mat-label>
+            <mat-select formControlName="urgency" required>
+              <mat-option value="low">Low</mat-option>
+              <mat-option value="medium">Medium</mat-option>
+              <mat-option value="high">High</mat-option>
+            </mat-select>
+            <mat-error *ngIf="f['urgency'].invalid">Please select urgency level</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Description*</mat-label>
+            <textarea matInput formControlName="description" required rows="4"></textarea>
+            <mat-error *ngIf="f['description'].invalid">Description must be at least 10 characters</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Technician ID*</mat-label>
+            <input matInput formControlName="technicianId" required>
+            <mat-error *ngIf="f['technicianId'].invalid">Technician ID is required</mat-error>
+          </mat-form-field>
+
+          <div class="button-group dual-buttons">
+            <button mat-stroked-button type="button" (click)="previousStep()" class="back-button">
+              Back
+            </button>
+            <button mat-raised-button color="primary" type="button" 
+                    (click)="nextStep()" class="submit-button"
+                    [disabled]="!f['category'].valid || !f['urgency'].valid || !f['description'].valid || !f['technicianId'].valid">
+              Next
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 3: Photo Upload -->
+        <div *ngIf="step === 3" class="form-step">
+          <div class="upload-section">
+            <input type="file" id="fileUpload" (change)="onFileSelected($event)" #fileInput hidden accept="image/*">
+            <button mat-raised-button type="button" (click)="fileInput.click()" class="upload-button">
+              Upload Photo
+            </button>
+            <div class="file-status">{{selectedFile?.name || 'No file selected'}}</div>
+            
+            <div class="preview" *ngIf="photoPreview">
+              <img [src]="photoPreview" alt="Preview">
+            </div>
+          </div>
+
+          <div class="button-group dual-buttons">
+            <button mat-stroked-button type="button" (click)="previousStep()" class="back-button">
+              Back
+            </button>
+            <button mat-raised-button color="primary" type="submit" 
+                    [disabled]="!maintenanceForm.valid" class="submit-button">
+              Submit Request
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

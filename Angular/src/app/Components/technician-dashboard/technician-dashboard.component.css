@@ -1,0 +1,142 @@
+.dashboard-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 220px;
+  height: 100vh;
+  background-color: #0a1d3f;
+  color: white;
+  position: fixed;
+  top: 0;
+  left: 0;
+  padding-top: 20px;
+  font-family: 'Segoe UI', sans-serif;
+  text-align: center;
+  z-index: 100;
+}
+
+.sidebar .app-logo {
+  height: 35px;
+  width: 35px;
+  margin-bottom: 5px;
+  cursor: pointer;
+}
+
+.sidebar hr {
+  border: none;
+  height: 1px;
+  background-color: #76777e;
+  margin: 10px 0;
+}
+
+.sidebar .profile-section {
+  padding: 0 15px;
+}
+
+.sidebar .profile-section .avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 10px;
+  border: 2px solid #3a4f7a;
+}
+
+.sidebar .profile-section h3 {
+  margin: 5px 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.sidebar .profile-section .role-badge {
+  background: #1e3a8a;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  display: inline-block;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+}
+
+.sidebar ul li {
+  margin: 15px 0;
+}
+
+.sidebar ul li a {
+  color: white;
+  text-decoration: none;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  transition: all 0.2s;
+}
+
+.sidebar ul li a:hover,
+.sidebar ul li a.active {
+  background-color: #142b53;
+  border-left: 4px solid #ffc107;
+}
+
+.sidebar ul li a .nav-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 12px;
+}
+
+.main-content {
+  margin-top: 60px;
+  margin-left: 220px; /* Same as sidebar width */
+  width: calc(100% - 220px);
+  padding: 20px;
+  background-color: #f5f7fa;
+}
+
+.stats-bar {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 0px;
+}
+
+.stat-card {
+  flex: 1;
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.stat-card h4 {
+  margin: 0 0 8px 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.stat-card p {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.stat-card.pending {
+  border-top: 3px solid #f59e0b;
+}
+
+.stat-card.completed {
+  border-top: 3px solid #10b981;
+}
+
+.content-container {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}

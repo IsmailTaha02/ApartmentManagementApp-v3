@@ -1,0 +1,59 @@
+<app-header></app-header>
+
+<div class="login-container">
+  <!-- Left Section: Login Form -->
+  <div class="form-section">
+    <div class="form-content">
+      <!-- Show user role after login (fixed signal access) -->
+      <div *ngIf="currentUser()?.role" class="role-box">
+        Logged in as <strong>{{ currentUser()?.role }}</strong>
+      </div>
+
+      <h2>Welcome Back!</h2>
+      <p class="subtitle">Log in to continue exploring amazing apartments.</p>
+
+      <form (submit)="onLogin(); $event.preventDefault();">
+        <div class="input-group">
+          <fa-icon [icon]="faUser" class="input-icon"></fa-icon>
+          <input type="email" placeholder="Enter your email" [(ngModel)]="username" name="username" required />
+        </div>
+
+        <div class="input-group">
+          <fa-icon [icon]="faLock" class="input-icon"></fa-icon>
+          <input type="password" placeholder="Enter your password" [(ngModel)]="password" name="password" required />
+        </div>
+
+        <button type="submit" class="btn-signin" [disabled]="isLoggingIn">
+          {{ isLoggingIn ? 'Logging in...' : 'Login Now →' }}
+        </button>
+      </form>
+
+      <!-- Show error message if login fails -->
+      <p *ngIf="errorMessage" class="error-message">{{ errorMessage }}</p>
+
+      <div class="forgot-password">
+        <a href="#">Forgot Password?</a>
+      </div>
+
+      <div class="divider">Or sign in with</div>
+
+      <div class="social-buttons">
+        <button class="social-login google" (click)="onGoogleLogin()">
+          <fa-icon [icon]="faGoogle" class="social-icon"></fa-icon> Google
+        </button>
+
+        <button class="social-login facebook" (click)="onFacebookLogin()">
+          <fa-icon [icon]="faFacebook" class="social-icon"></fa-icon> Facebook
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Section: Image & Text -->
+  <div class="image-section">
+    <div class="overlay">
+      <h1>Discover Your Perfect Home</h1>
+      <p>Find modern apartments and unique places to stay.</p>
+    </div>
+  </div>
+</div>

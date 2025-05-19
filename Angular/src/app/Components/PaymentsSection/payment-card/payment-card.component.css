@@ -1,0 +1,35 @@
+.card {
+    background: white;
+    padding: 1rem;
+    border-radius: 16px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+    transition: transform 0.2s ease-in-out;
+    cursor: pointer;
+  
+    &.due { border-left: 5px solid #1537fa; }
+    &.overdue { border-left: 5px solid #ef4444; }
+    &.done { border-left: 5px solid #10b981; }
+  
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+    }
+  
+    .status-icon {
+      font-size: 1.5rem;
+    }
+  
+    .info {
+      margin-top: 0.5rem;
+      font-size: 0.95rem;
+      color: #4b5563;
+    }
+  
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+    }
+  }
+  

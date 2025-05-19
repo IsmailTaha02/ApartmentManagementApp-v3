@@ -1,0 +1,28 @@
+.topbar {
+    height: 70px;
+    background-color: #ffffff;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 220px;
+    z-index: 10;
+    border: 1px solid #b9bdc1;
+  
+    .page-title {
+      display: flex;
+      align-items: center;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #2c3e50;
+  
+      i {
+        margin-right: 10px;
+        color: #2c3e50;
+      }
+    }
+  }
+  

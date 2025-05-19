@@ -1,0 +1,64 @@
+<nav class="sidebar">
+    <img routerLink="/home-page" src="app-logo.png" alt="App Logo" class="app-logo">
+    <hr>
+    <ul>
+      <li>
+        <a routerLink="/owner-dashboard">
+          <img src="icons/dashboard.png" alt="dashboardIcon" class="nav-icon">
+          Dashboard
+        </a>
+      </li>
+      <li>
+        <a routerLink="/owner-dashboard/admin-apartments">
+          <img src="icons/apartment.png" alt="apartment Icon" class="nav-icon">
+          Apartments
+        </a>
+      </li>
+      <li>
+        <a routerLink="/owner-dashboard/contracts">
+          <img src="icons/contract.png" alt="contract Icon" class="nav-icon">
+          Contracts
+        </a>
+      </li>
+      <li>
+        <a routerLink="/owner-dashboard/messages">
+          <img src="icons/messages.png" alt="messages Icon" class="nav-icon">
+          Messages
+        </a>
+      </li>
+      <li>
+        <a routerLink="/owner-dashboard/maintanance">
+          <img src="icons/maintanance.png" alt="maintanance Icon" class="nav-icon">
+          Maint. & Repairs
+        </a>
+      </li>
+      <li>
+        <a routerLink="/owner-dashboard/admin-payments">
+          <img src="icons/payments.png" alt="paymentsIcon" class="nav-icon">
+          Payments
+        </a>
+      </li>
+      <li>
+        <a routerLink="/owner-dashboard/bank-cards">
+          <img src="icons/bank_cards.png" alt="bank-cards Icon" class="nav-icon">
+          Banks & Cards
+        </a>
+      </li>
+      <li>
+        <a routerLink="/owner-dashboard/help">
+          <img src="icons/help.png" alt="Help Icon" class="nav-icon">
+          Help
+        </a>
+      </li>
+      <li>
+        <a routerLink="/owner-dashboard/home-page">
+          <img src="icons/logout.png" alt="logout Icon" class="nav-icon">
+          Logut
+        </a>
+      </li>
+    </ul>
+</nav>
+ 
+<main class="dashboard-content">
+  <router-outlet></router-outlet>
+</main>

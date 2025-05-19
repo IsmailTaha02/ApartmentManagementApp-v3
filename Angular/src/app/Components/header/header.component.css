@@ -1,0 +1,77 @@
+
+
+/* Header Banner */
+.header-banner {
+    position: fixed;  /* Fixed at the top of the page */
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: #010117;  /* Dark background for the header */
+    color: white;
+    padding: 10px 20px;  /* Add some padding to the header */
+    z-index: 20;  /* Ensure it's above other content */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;  /* Align logo and name */
+    justify-content:center;
+  }
+  
+  .logo-container {
+    display: flex;
+    align-items: center;
+  }
+  
+  .app-logo {
+    width: 40px;  /* Set a size for the logo */
+    height: 40px;  /* Set a size for the logo */
+    margin-right: 10px;  /* Space between logo and app name */
+    cursor: pointer;
+  }
+  
+  .app-name {
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  /* Auth Buttons inside header */
+  .auth-buttons {
+    position: absolute;  /* Ensure buttons are in the top-right corner */
+    top: 20px;
+    right: 20px;
+    z-index: 10;
+  }
+  
+  .auth-buttons button {
+    width: 100px;
+    margin-left: 10px;
+    padding: 10px 15px;
+    font-size: 1rem;
+    background-color: transparent;
+    color: #ffffff;
+    border: 2px solid #ffffff;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .auth-buttons button:hover {
+    background-color: #ffffff;
+    color: #000000;
+    opacity: 0.8;
+  }
+  
+/* 
+  For phones (on future)
+  @media screen and (max-width: 768px) {
+    .header-banner {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+  
+    .auth-buttons {
+      margin-top: 10px;
+    }
+  }
+   */

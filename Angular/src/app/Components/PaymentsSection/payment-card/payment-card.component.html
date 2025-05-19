@@ -1,0 +1,14 @@
+<div class="card" [ngClass]="status">
+    <div class="header">
+      <h3>{{ title }}</h3>
+      <span class="status-icon" *ngIf="status === 'overdue'">⚠️</span>
+      <span class="status-icon" *ngIf="status === 'due'">💰</span>
+      <span class="status-icon" *ngIf="status === 'done'">✅</span>
+    </div>
+    <div class="info">
+      <p>Amount: <strong>${{ amount }}</strong></p>
+      <p>Due Date: <strong>{{ dueDate }}</strong></p>
+      <p>Paid Date: <strong>{{ paidDate }}</strong></p>
+    </div>
+  </div>
+  

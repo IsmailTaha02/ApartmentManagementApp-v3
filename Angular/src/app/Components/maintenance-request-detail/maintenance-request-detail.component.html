@@ -1,0 +1,62 @@
+<div class="detail-container">
+    <button mat-stroked-button (click)="goBack()" class="back-button">
+      Back to Requests
+    </button>
+  
+    <mat-card *ngIf="request" class="detail-card" [class]="statusClass">
+      <mat-card-header>
+        <mat-card-title>
+          {{ request.problemType | titlecase }} Request
+        </mat-card-title>
+        <mat-card-subtitle>
+          Request #{{ request.id }} • Created on {{ formatDate(request.createdAt) }}
+        </mat-card-subtitle>
+      </mat-card-header>
+  
+      <mat-card-content>
+        <div class="detail-grid">
+          <div class="detail-section">
+            <h3>Status</h3>
+            <div class="status-display {{ statusClass }}">
+              {{ request.status | titlecase }}
+            </div>
+          </div>
+  
+          <div class="detail-section">
+            <h3>Apartment</h3>
+            <p>{{ request.apartmentNumber || 'Not provided' }}</p>
+          </div>
+  
+          <div class="detail-section">
+            <h3>Priority</h3>
+            <p class="priority-badge {{ request.priority.toLowerCase() }}">
+              {{ request.priority | titlecase }}
+            </p>
+          </div>
+  
+          <div class="detail-section full-width">
+            <h3>Description</h3>
+            <p class="description-text">
+              {{ (request.description || '').trim() || 'No description provided.' }}
+            </p>
+          </div>
+  
+          @if (request.response) {
+            <div class="detail-section full-width response-section">
+              <h3>Technician Response</h3>
+              <p class="response-text">{{ request.response }}</p>
+              @if (request.technician_id) {
+                <p class="technician-info">Handled by Technician #{{ request.technician_id }}</p>
+              }
+            </div>
+          }
+        </div>
+      </mat-card-content>
+    </mat-card>
+  
+    <div *ngIf="!request" class="loading-state">
+      <mat-spinner diameter="50"></mat-spinner>
+      <p>Loading request details...</p>
+    </div>
+  </div>
+  

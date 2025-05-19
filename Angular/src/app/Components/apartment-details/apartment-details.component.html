@@ -1,0 +1,61 @@
+<app-header></app-header>
+
+<div class="apartment-details-container" *ngIf="apartment"> 
+    <!-- Left Section: Image & Media -->
+    <div class="image-gallery">
+        <img [src]="mainPhoto" class="main-photo" alt="Apartment Image">
+        
+        <!-- Thumbnails -->
+        <div class="thumbnail-container" *ngIf="apartment?.photos?.length > 1">
+            <img *ngFor="let photo of apartment.photos"
+                 [src]="photo"
+                 class="thumbnail"
+                 (click)="changeMainPhoto(photo)">
+        </div>
+    </div>
+
+    <!-- Right Section: Apartment Details -->
+    <div class="details-content">
+        <h1>{{ apartment?.location || 'Unknown Location' }}</h1>
+        <p class="price">{{ apartment?.price ? (apartment.price + ' $') : 'Price Not Available' }}</p>
+        <p><strong>Type:</strong> {{ apartment?.type || 'N/A' }}</p>
+        <p><strong>Area:</strong> {{ apartment?.area ? (apartment.area + ' sqft') : 'N/A' }}</p>
+        <p><strong>Rooms:</strong> {{ apartment?.number_of_rooms || 'N/A' }}</p>
+        <p><strong>Description:</strong> {{ apartment?.description || 'No description available' }}</p>
+        <p><strong>Status:</strong> {{ apartment?.status || 'N/A' }}</p>
+
+        <!-- Parking Availability -->
+        <p *ngIf="apartment?.parking_availability !== undefined">
+            <strong>Parking:</strong> 
+            <span *ngIf="apartment.parking_availability; else noParking">Available ✅</span>
+            <ng-template #noParking>Not Available ❌</ng-template>
+        </p>
+
+        <!-- Video Tour -->
+        <div *ngIf="safeVideoUrl">
+            <h3>Video Tour</h3>
+            <iframe [src]="safeVideoUrl" frameborder="0" allowfullscreen></iframe>
+        </div>
+
+        <!-- Map Location -->
+        <div *ngIf="safeMapUrl">
+            <h3>Map Location</h3>
+            <iframe [src]="safeMapUrl" width="100%" height="250" frameborder="0"></iframe>
+        </div>
+
+        <!-- Go Back Button -->
+        <button class="go-back-btn" (click)="goBack()">← Go Back</button>
+    </div>
+</div>
+
+<!-- Loading State -->
+<div class="loading-container" *ngIf="!apartment && !error">
+    <h2>Loading Apartment Details...</h2>
+</div>
+
+<!-- Error Message if Apartment Not Found -->
+<div class="error-message" *ngIf="error">
+    <h2>Error Loading Apartment</h2>
+    <p>{{ error }}</p>
+    <button class="go-back-btn" (click)="goBack()">← Go Back</button>
+</div>

@@ -1,0 +1,64 @@
+<app-messages-topbar></app-messages-topbar>
+
+<div class="new-chat-bar">
+  <label>Start New Chat:</label>
+  <ng-select
+  [items]="filteredAvailableUsers"
+  bindLabel="full_name"
+  bindValue="id"
+  [(ngModel)]="newChatReceiver"
+  placeholder="Select user to chat"
+  (change)="onSelectUser($event)"
+  >
+  </ng-select>
+  <input [(ngModel)]="newChatMessage" type="text" placeholder="Enter message" />
+  <button (click)="startNewChat()">Send</button>
+  
+</div>
+
+<div class="chat-container">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">Inbox</div>
+
+    <div 
+      *ngFor="let chat of chats" 
+      class="sidebar-chat"
+      (click)="selectChat(chat)"
+      [ngClass]="{ 'selected-chat': selectedChat?.id === chat.id }"
+    >
+      <div class="chat-avatar">
+        {{ getInitials(chat.name) }}
+      </div>
+      <div class="chat-details">
+        <div class="chat-name">{{ chat.name }} ({{chat.role}})</div>
+        <div class="chat-last-message">{{ chat.lastMessage }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chat Window -->
+  <div class="chat-window">
+    <div class="chat-header">
+      <h2>{{ selectedChat?.name || 'Select a conversation' }}</h2>
+    </div>
+
+    <div class="chat-messages">
+      <div 
+        *ngFor="let msg of selectedChat?.messages" 
+        class="message-row" 
+        [ngClass]="{ 'own-message': msg.isOwn }"
+      >
+        <div class="message-bubble">
+          <div class="message-content">{{ msg.content }}</div>
+          <div class="message-timestamp">{{ msg.timestamp | date:'shortTime' }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="message-input">
+      <input [(ngModel)]="newMessage" type="text" placeholder="Type your message..." />
+      <button (click)="sendMessage()">Send</button>
+    </div>
+  </div>
+</div>

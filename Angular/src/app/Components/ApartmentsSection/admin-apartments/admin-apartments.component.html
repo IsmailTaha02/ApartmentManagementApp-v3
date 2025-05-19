@@ -1,0 +1,156 @@
+<!-- <app-sidebar></app-sidebar> -->
+<app-apartment-topbar></app-apartment-topbar>
+
+<div class="admin-apartments-wrapper">
+
+  <!-- Header + Add Button -->
+  <div class="add-apartment-header">
+    <h2>🏢 Manage Apartments</h2>
+    <button class="add-btn" (click)="showAddForm = true">+ Add Apartment</button>
+  </div>
+
+  <!-- Add Apartment Form -->
+  <div class="add-apartment-form" *ngIf="showAddForm">
+    <h3>Add New Apartment</h3>
+    <form (ngSubmit)="submitNewApartment()" enctype="multipart/form-data">
+      <input type="text" [(ngModel)]="newApartment.city" name="city" placeholder="City" required>
+      <input type="text" [(ngModel)]="newApartment.location" name="location" placeholder="Address" required>
+      <input type="text" [(ngModel)]="newApartment.unit_number" name="unit_number" placeholder="Unit Number" required>
+      <input type="number" [(ngModel)]="newApartment.price" name="price" placeholder="Price" required>
+      <input type="number" [(ngModel)]="newApartment.area" name="area" placeholder="Area (m²)" required>
+      <input type="number" [(ngModel)]="newApartment.number_of_rooms" name="number_of_rooms" placeholder="Number of Rooms" required>
+    
+      <select [(ngModel)]="newApartment.type" name="type" required>
+        <option value="For Rent">For Rent</option>
+        <option value="For Sale">For Sale</option>
+      </select>
+    
+      <select [(ngModel)]="newApartment.status" name="status">
+        <option value="Available">Available</option>
+        <option value="Sold">Sold</option>
+        <option value="Rented">Rented</option>
+      </select>
+    
+      <!-- Full-width description -->
+      <textarea [(ngModel)]="newApartment.description" name="description" placeholder="Description" class="full-width"></textarea>
+    
+      <!-- Full-width image preview + file input -->
+      <div class="image-preview-list full-width" *ngIf="uploadedPhotos.length > 0">
+        <div *ngFor="let img of uploadedPhotos; let i = index" class="image-preview">
+          <img [src]="getImagePreview(img)" alt="Preview" />
+          <div class="remove-icon" (click)="removeNewPhoto(i)">✖</div>
+        </div>
+      </div>
+    
+      <input type="file" (change)="handleNewPhotoUpload($event)" multiple accept="image/*" class="full-width" />
+    
+      <div class="form-actions full-width">
+        <button type="submit">Save</button>
+        <button type="button" (click)="showAddForm = false">Cancel</button>
+      </div>
+    </form>
+    
+  </div>
+
+
+  <div *ngIf="addSuccess" class="success-msg">
+    ✅ Apartment added successfully!
+  </div>
+  
+  <!-- Filters Section -->
+  <div class="filter-panel">
+    <select [(ngModel)]="typeFilter">
+      <option value="">All Types</option>
+      <option value="For Sale">For Sale</option>
+      <option value="For Rent">For Rent</option>
+    </select>
+    <input type="text" [(ngModel)]="cityFilter" placeholder="City" />
+    <input type="text" [(ngModel)]="locationFilter" placeholder="Address" />
+    <input type="text" [(ngModel)]="unitNumber" placeholder="Unit" />
+    <input type="number" [(ngModel)]="minPrice" placeholder="Min Price" />
+    <input type="number" [(ngModel)]="maxPrice" placeholder="Max Price" />
+    <input type="number" [(ngModel)]="minArea" placeholder="Min Area (m²)" />
+    <input type="number" [(ngModel)]="maxArea" placeholder="Max Area (m²)" />
+    <button (click)="applyFilters()">Apply Filters</button>
+  </div>
+
+  <!-- Results Section -->
+  <div class="apartment-grid">
+    <div class="apartment-card" *ngFor="let apt of filteredApartments">
+      <!-- Clickable Section -->
+      <div [routerLink]="['/apartment', apt.id]" class="card-clickable">
+        <div class="card-image">
+          <img [src]="apt.photos?.[0] || 'assets/default-image.jpg'" alt="Apartment image" class="card-img">
+        </div>
+        <h3>{{ apt.city }}-{{ apt.location }} ({{ apt.unit_number }})</h3>
+        <p><strong>{{ apt.type }}</strong></p>
+        <p><strong>Area:</strong> {{ apt.area }} m²</p>
+        <p><strong>Rooms:</strong> {{ apt.number_of_rooms }}</p>
+        <p><strong>Price:</strong> ${{ apt.price }}</p>
+        <p><strong>Status:</strong> {{ apt.status }}</p>
+      </div>
+
+      <!-- Separate Edit Button -->
+      <button class="edit-btn" (click)="openEditModal(apt); $event.stopPropagation()">Edit</button>
+      <button class="delete-btn" (click)="opendeleteModal(apt); $event.stopPropagation()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="edit-modal" *ngIf="selectedApartment">
+  <div class="modal-content">
+    <h3>Edit Apartment</h3>
+
+    <label>City</label>
+    <input [(ngModel)]="selectedApartment.city" type="text" />
+
+    <label>Address</label>
+    <input [(ngModel)]="selectedApartment.location" type="text" />
+
+    <label>Unit Number</label>
+    <input [(ngModel)]="selectedApartment.unit_number" type="text" />
+
+    <label>Price</label>
+    <input [(ngModel)]="selectedApartment.price" type="number" />
+
+    <label>Area</label>
+    <input [(ngModel)]="selectedApartment.area" type="number" />
+
+    <label>Number of Rooms</label>
+    <input [(ngModel)]="selectedApartment.number_of_rooms" type="number" />
+
+    <label>Status</label>
+    <select [(ngModel)]="selectedApartment.status">
+      <option value="Available">Available</option>
+      <option value="Sold">Sold</option>
+      <option value="Rented">Rented</option>
+    </select>
+
+    <div class="modal-actions">
+      <button (click)="updateApartment()">Save</button>
+      <button (click)="selectedApartment = null">Cancel</button>
+    </div>
+
+    <div class="image-section">
+      <h4>📷 Apartment Images</h4>
+      <div class="image-preview-list">
+        <div *ngFor="let img of selectedApartment.photos; let i = index" class="image-preview">
+          <img [src]="img" alt="Apartment Photo" />
+          <div class="remove-icon" (click)="removeImage(i)">✖</div>
+        </div>
+      </div>
+      <input type="file" multiple (change)="handleImageUpload($event)" accept="image/*" />
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal-backdrop" *ngIf="showDeleteModal">
+  <div class="modal">
+    <h3>Confirm Delete</h3>
+    <p>Are you sure you want to delete this apartment: <strong>{{ apartmentToDelete?.unit_number }}</strong>?</p>
+    <button (click)="confirmDelete()" class="confirm-btn">Yes, Delete</button>
+    <button (click)="cancelDelete()" class="cancel-btn">Cancel</button>
+  </div>
+</div>
