@@ -14,6 +14,8 @@ from Classes.User import User
 from Classes.Payment import Payment
 from Classes.Message import Message
 from Classes.Transaction import Transaction
+from werkzeug.security import generate_password_hash
+import jwt
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -35,6 +37,18 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+
+with app.app_context():
+    users = User.query.all()
+    updated = 0
+    for user in users:
+        if not (user.password.startswith('scrypt:') or user.password.startswith('pbkdf2:')):
+            user.password = generate_password_hash(user.password, method='scrypt')
+            updated += 1
+            print(f"Updated password for {user.email}")
+    db.session.commit()
+    print(f"Total updated passwords: {updated}")
+    
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
@@ -86,6 +100,73 @@ with app.app_context():
 def get_users():
     users = User.query.all()
     return jsonify([user.to_dict() for user in users])
+
+
+SECRET_KEY = 'YOUR_SECRET_KEY'  # Replace with a strong secret key or load from env
+
+@app.route('/users', methods=['POST'])
+def create_user():
+    data = request.get_json()
+
+    if not data:
+        return jsonify({'error': 'Invalid request: no JSON body found'}), 400
+
+    full_name = data.get('full_name')
+    email = data.get('email')
+    phone_number = data.get('phone_number')
+    role = data.get('role')
+    job = data.get('job')
+    facebook_link = data.get('facebook_link')
+    password = data.get('password')
+
+    # Basic field validation
+    if not all([full_name, email, phone_number, role, password]):
+        return jsonify({'error': 'Missing required fields'}), 400
+
+    # Check if email exists
+    if User.query.filter_by(email=email).first():
+        return jsonify({'error': 'Email already exists'}), 409
+
+    try:
+        password_hash = generate_password_hash(password)
+
+        new_user = User(
+            full_name=full_name,
+            email=email,
+            phone_number=phone_number,
+            role=role,
+            job=job,
+            facebook_link=facebook_link,
+            password=password_hash,
+            is_verified=False  # default, until verified
+        )
+
+        db.session.add(new_user)
+        db.session.commit()
+
+        # Optionally generate JWT token
+        token = jwt.encode(
+            {'user_id': new_user.id, 'email': new_user.email},
+            SECRET_KEY,
+            algorithm='HS256'
+        )
+
+        return jsonify({
+            'message': 'User created successfully',
+            'user': new_user.to_dict(),
+            'token': token
+        }), 201
+
+    except exc.SQLAlchemyError as e:
+        db.session.rollback()
+        logger.error(f"Error creating user: {str(e)}")
+        return jsonify({'error': 'Database error. Please try again.'}), 500
+
+    except Exception as e:
+        logger.error(f"Unexpected error: {str(e)}")
+        return jsonify({'error': 'Internal server error'}), 500
+
+
 
 
 # Route to get apartments related to a specific user
@@ -370,6 +451,8 @@ def get_technician_stats(technician_id):
         'completed': completed_requests
     })
 
+from werkzeug.security import check_password_hash
+
 @app.route('/api/login', methods=['POST'])
 def login():
     data = request.get_json()
@@ -378,7 +461,7 @@ def login():
 
     user = User.query.filter_by(email=email).first()
 
-    if user and user.password == password:
+    if user and check_password_hash(user.password, password):
         return jsonify({
             'message': 'Login successful',
             'user': {
@@ -604,20 +687,41 @@ def get_messages_for_user():
 
 @app.route('/messages', methods=['POST'])
 def send_message():
-    data = request.json
-    msg = Message(
-        sender_id=data['sender_id'],
-        receiver_id=data['receiver_id'],
-        apartment_id=data.get('apartment_id'),
-        message_type=data.get('message_type', 'Text'),
-        content=data['content']
-    )
-    db.session.add(msg)
-    db.session.commit()
-    return jsonify(msg.to_dict()), 201
+    try:
+        data = request.json
+        sender_id = data.get('sender_id')
+        receiver_id = data.get('receiver_id')
+        apartment_id = data.get('apartment_id')
+        content = data.get('content')
 
+        if not sender_id or not content:
+            return jsonify({"error": "sender_id and content are required"}), 400
 
+        if not receiver_id and apartment_id:
+            apartment = Apartment.query.get(apartment_id)
+            if not apartment:
+                return jsonify({"error": "Apartment not found"}), 404
+            receiver_id = apartment.owner_id
 
+        if not receiver_id:
+            return jsonify({"error": "receiver_id is required if apartment_id not provided"}), 400
+
+        msg = Message(
+            sender_id=sender_id,
+            receiver_id=receiver_id,
+            apartment_id=apartment_id,
+            message_type = data.get('message_type', 'General'),
+            content=content
+        )
+
+        db.session.add(msg)
+        db.session.commit()
+
+        return jsonify(msg.to_dict()), 201
+
+    except Exception as e:
+        print(f"Error in /messages: {e}")
+        return jsonify({"error": str(e)}), 500
 
 
 if __name__ == '__main__':

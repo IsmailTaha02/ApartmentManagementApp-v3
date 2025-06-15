@@ -4,6 +4,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MessagesTopbarComponent } from '../TopBar/messages-topbar/messages-topbar.component';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   standalone: true,
@@ -26,12 +28,37 @@ export class MessagesComponent implements OnInit {
   availableUsers: any[] = [];
 
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private router:Router,private route:ActivatedRoute) {}
+
 
   ngOnInit(): void {
-    this.loadMessages();
-    this.loadAvailableUsers();
+    this.route.queryParams.subscribe(params => {
+      const apartmentId = params['apartmentId'];
+      if (apartmentId) {
+        this.initiateContactWithOwner(apartmentId);
+      }
+      this.loadMessages();
+      this.loadAvailableUsers();
+    });
   }
+  
+  initiateContactWithOwner(apartmentId: number): void {
+    const newMsg = {
+      sender_id: this.userId,
+      apartment_id: apartmentId,
+      content: 'Hello, I would like to contact you regarding your apartment.'
+    };
+  
+    this.http.post('http://localhost:5000/messages', newMsg).subscribe(() => {
+      this.loadMessages(); // refresh and show the chat
+    });
+
+    this.router.navigate([], {
+      queryParams: { apartmentId: null },
+      queryParamsHandling: 'merge'
+    });
+    
+  }  
 
   loadMessages(): void {
     this.http.get<any[]>(`http://localhost:5000/messages?user_id=${this.userId}`).subscribe(data => {
@@ -51,6 +78,10 @@ export class MessagesComponent implements OnInit {
     });
   }
 
+
+  // goToContactOwner(ownerId: number) {
+  //   this.router.navigate([`/contact-owner/${ownerId}`]);
+  // }
 
   onSelectUser(selected: any) {
     console.log('Selected user ID:', selected);

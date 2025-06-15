@@ -2,19 +2,34 @@
 
 <div class="new-chat-bar">
   <label>Start New Chat:</label>
+  
   <ng-select
-  [items]="filteredAvailableUsers"
-  bindLabel="full_name"
-  bindValue="id"
-  [(ngModel)]="newChatReceiver"
-  placeholder="Select user to chat"
-  (change)="onSelectUser($event)"
+    [items]="filteredAvailableUsers"
+    bindLabel="full_name"
+    bindValue="id"
+    [(ngModel)]="newChatReceiver"
+    placeholder="Select user to chat"
+    (change)="onSelectUser($event)"
   >
   </ng-select>
+
   <input [(ngModel)]="newChatMessage" type="text" placeholder="Enter message" />
+
   <button (click)="startNewChat()">Send</button>
-  
+
+  <!-- <span class="or-separator">or</span>
+
+  <div class="owner-contact">
+    <button 
+      (click)="goToContactOwner(selectedChat?.id)" 
+      class="contact-owner-btn"
+      [disabled]="!selectedChat"
+    >
+      Contact Owner
+    </button>
+  </div> -->
 </div>
+
 
 <div class="chat-container">
   <!-- Sidebar -->

@@ -2,13 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { SidebarComponent } from '../../sidebar/sidebar.component';
 import { ApartmentTopbarComponent } from '../../TopBar/apartment-topbar/apartment-topbar.component';
+import { Router } from '@angular/router';
+import { RouterModule } from '@angular/router'; 
 
 @Component({
   selector: 'app-customer-apartments',
   standalone: true,
-  imports: [CommonModule, FormsModule, SidebarComponent, ApartmentTopbarComponent],
+  imports: [CommonModule, FormsModule, ApartmentTopbarComponent, RouterModule],
   templateUrl: './customer-apartments.component.html',
   styleUrls: ['./customer-apartments.component.scss']
 })
@@ -27,7 +28,7 @@ export class CustomerApartmentsComponent implements OnInit {
   minArea: number | null = null;
   maxArea: number | null = null;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient,private router: Router) {}
 
   ngOnInit(): void {
     this.loadMyApartments();

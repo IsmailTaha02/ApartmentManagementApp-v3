@@ -1,0 +1,29 @@
+<div class="contact-owner-container" *ngIf="apartmentLoaded; else loading">
+    <h2>Contact Owner</h2>
+  
+    <div class="apartment-info">
+      <h3>{{ apartment.title }}</h3>
+      <p>{{ apartment.description }}</p>
+    </div>
+  
+    <form (ngSubmit)="sendMessage()">
+      <textarea 
+        [(ngModel)]="message" 
+        name="message" 
+        rows="5" 
+        placeholder="Write your message to the owner..." 
+        required></textarea>
+      
+      <button type="submit" [disabled]="sending || !message.trim()"> 
+        {{ sending ? 'Sending...' : 'Send Message' }} 
+      </button>
+    </form>
+  
+    <p class="success" *ngIf="sendSuccess">✅ Your message was sent!</p>
+    <p class="error" *ngIf="error">{{ error }}</p>
+  </div>
+  
+  <ng-template #loading>
+    <p>Loading apartment info...</p>
+  </ng-template>
+  

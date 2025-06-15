@@ -9,7 +9,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 @Component({
   selector: 'app-admin-payments',
   standalone: true,
-  imports: [CommonModule,FormsModule,SidebarComponent,PaymentsTopbarComponent,NgSelectModule],
+  imports: [CommonModule,FormsModule,PaymentsTopbarComponent,NgSelectModule],
   templateUrl: './admin-payments.component.html',
   styleUrls: ['./admin-payments.component.scss']
 })

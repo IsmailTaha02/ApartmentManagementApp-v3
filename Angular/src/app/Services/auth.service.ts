@@ -3,12 +3,13 @@ import { Router } from '@angular/router';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 interface User {
-  id: string;
+  id: number;  // change this
   name: string;
   fullName?: string;
   email?: string;
   phone?: string;
 }
+
 
 @Injectable({
   providedIn: 'root'
@@ -51,7 +52,7 @@ export class AuthService {
     this.router.navigate(['/login']);
   }
 
-  getCurrentUserId(): string {
+  getCurrentUserId(): number {
     const user = this.getCurrentUser();
     if (!user) {
       throw new Error('No user is currently authenticated');

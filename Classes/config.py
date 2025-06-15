@@ -9,7 +9,7 @@ migrate = Migrate()
 
 def configure_app(app):
     """Configure app with database and other settings."""
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root@localhost/apartmentmanagementdb2'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:Aa123123123.@localhost/apartmentmanagementdb'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     db.init_app(app)

@@ -8,6 +8,6 @@
   <div class="auth-buttons">
     <!-- Only show the login button if the current route is not 'login' -->
     <button *ngIf="!hideLoginButton" routerLink="/login" class="login-btn">Login</button>
-    <button class="signup-btn">Sign Up</button>
+    <button *ngIf="!hideSignupButton" routerLink="/signup" class="signup-btn">Sign Up</button>
   </div>
 </header>

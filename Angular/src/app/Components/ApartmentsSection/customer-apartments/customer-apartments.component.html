@@ -12,7 +12,7 @@
   <div *ngIf="activeTab === 'mine'" class="tab-content">
     <h3>My Rented / Purchased Apartments</h3>
     <div class="apartment-grid">
-      <div class="apartment-card" *ngFor="let apt of myApartments">
+      <div class="apartment-card" *ngFor="let apt of myApartments" [routerLink]="['/apartment', apt.id]">
         <img [src]="apt.photos?.[0] || 'assets/default-image.jpg'" class="card-img" />
         <h4>{{ apt.location }} ({{ apt.unit_number }})</h4>
         <p><strong>Area:</strong> {{ apt.area }} m²</p>
@@ -40,8 +40,8 @@
       <button (click)="applySearchFilters()">Search</button>
     </div>
 
-    <div class="apartment-grid">
-      <div class="apartment-card" *ngFor="let apt of searchResults">
+    <div class="apartment-grid" >
+      <div class="apartment-card" *ngFor="let apt of searchResults" [routerLink]="['/apartment', apt.id]">
         <img [src]="apt.photos?.[0] || 'assets/default-image.jpg'" class="card-img" />
         <h4>{{ apt.location }} ({{ apt.unit_number }})</h4>
         <p><strong>Type:</strong> {{ apt.type }}</p>

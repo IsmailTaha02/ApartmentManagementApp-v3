@@ -30,6 +30,16 @@ export const routes: Route[] = [
     loadComponent: () =>
       import('./Components/LoginPage/login/login.component').then(m => m.LoginComponent)
   },
+  {
+    path: 'signup',
+    loadComponent: () =>
+      import('./Components/signup-page/signup-page.component').then(m => m.SignupPageComponent)
+  },
+  {
+    path: 'contact-owner/:apartmentId',
+    loadComponent: () =>
+      import('./Components/contact-owner/contact-owner.component').then(m => m.ContactOwner)
+  },
 
   // ================= MAINTENANCE CENTER =================
   {

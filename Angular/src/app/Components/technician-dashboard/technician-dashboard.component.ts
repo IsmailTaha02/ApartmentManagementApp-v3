@@ -2,7 +2,7 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { TechnicianService } from '../../Services/technician.service';
-
+import { AuthService } from '../../Services/auth.service';
 @Component({
   selector: 'app-technician-dashboard',
   standalone: true,
@@ -15,7 +15,7 @@ export class TechnicianDashboardComponent implements OnInit {
   currentUserRole = signal<string | null>(null);
   technicianId = signal<number | null>(null);
   technicianName = signal<string>('Loading...');
-  technicianAvatar = signal<string>('assets/images/default-avatar.png');
+  technicianAvatar = signal<string>('icons/technician-icon.png');
 
   // Dashboard Stats
   totalRequests = signal<number>(0);
@@ -28,7 +28,8 @@ export class TechnicianDashboardComponent implements OnInit {
 
   constructor(
     private technicianService: TechnicianService,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -44,7 +45,7 @@ export class TechnicianDashboardComponent implements OnInit {
         
         if (user.role === 'Technician') {
           this.technicianId.set(user.id);
-          this.technicianName.set(user.name || 'Technician');
+          this.technicianName.set(user.full_name || 'Technician');
           this.technicianAvatar.set(user.avatar || this.technicianAvatar());
           this.loadDashboardStats();
         } else {
@@ -85,12 +86,7 @@ export class TechnicianDashboardComponent implements OnInit {
   }
 
   logout(): void {
-    // Clear all authentication data
-    localStorage.removeItem('currentUser');
-    localStorage.removeItem('user_id');
-    localStorage.removeItem('role');
-    
-    // Navigate to home page
+    this.authService.logout();
     this.router.navigate(['/home-page']);
   }
 

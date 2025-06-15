@@ -1,6 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
+import { AuthService } from '../../Services/auth.service';
 
 @Component({
   selector: 'app-tenant-dashboard',
@@ -12,16 +13,26 @@ import { RouterModule, Router } from '@angular/router';
 export class TenantDashboardComponent implements OnInit {
   userId = signal<number>(0);
   tenantName = signal<string>('Tenant User'); // Default name
-  tenantAvatar = signal<string>('assets/images/default-avatar.png'); // Default avatar
+  tenantAvatar = signal<string>('icons/customer-icon.png'); // Default avatar
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private authService: AuthService) {}
 
   ngOnInit(): void {
     const storedUserId = localStorage.getItem('user_id');
+    const storedUser = localStorage.getItem('currentUser');
+
     if (storedUserId) {
       this.userId.set(parseInt(storedUserId, 10));
     }
 
+    if (storedUser) {
+      try {
+        const user = JSON.parse(storedUser);
+        this.tenantName.set(user.full_name || user.email || 'Tenant User');
+      } catch (e) {
+        console.error('Failed to parse currentUser from localStorage:', e);
+      }  
+    }
     // Load additional tenant data if needed
     this.loadTenantData();
   }
@@ -36,8 +47,6 @@ export class TenantDashboardComponent implements OnInit {
   }
 
   logout(): void {
-    localStorage.removeItem('user_id');
-    localStorage.removeItem('role');
-    this.router.navigate(['/login']);
+    this.authService.logout();
   }
 }

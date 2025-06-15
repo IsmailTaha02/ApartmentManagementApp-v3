@@ -43,8 +43,10 @@
             <iframe [src]="safeMapUrl" width="100%" height="250" frameborder="0"></iframe>
         </div>
 
-        <!-- Go Back Button -->
-        <button class="go-back-btn" (click)="goBack()">← Go Back</button>
+        <div class="contact-owner-section">
+            <button (click)="contactOwner(apartment.id)" class="contact-owner-btn">📩 Contact Owner</button>
+        </div>
+          
     </div>
 </div>
 

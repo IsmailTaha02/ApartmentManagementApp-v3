@@ -11,6 +11,7 @@ import { ChangeDetectorRef } from '@angular/core';
 })
 export class HeaderComponent implements OnInit {
   hideLoginButton: boolean = false;
+  hideSignupButton: boolean = false;
 
   constructor(private router: Router, private cdr: ChangeDetectorRef) {}
 
@@ -18,6 +19,8 @@ export class HeaderComponent implements OnInit {
     const currentUrl = this.router.url;
     console.log('Header on init with URL:', currentUrl);
     this.hideLoginButton = currentUrl.includes('login');
+    this.hideSignupButton = currentUrl.includes('signup');
+    
   }
  
 }

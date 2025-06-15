@@ -43,7 +43,7 @@
   .selected-chat {
     background-color: #e0e7ff;
   }
-  
+
   .chat-avatar {
     width: 40px;
     height: 40px;
@@ -248,6 +248,22 @@
       background-color: #e0e0e0;
       font-weight: 500;
     }    
+
+    /* .or-separator {
+      font-weight: bold;
+      color: #666;
+      padding: 0 5px;
+    }
+
+    .contact-owner-btn {
+      padding: 12px 15px;
+      background-color: #000000;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    } */
     
   }
   
+

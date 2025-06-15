@@ -35,19 +35,16 @@
   padding: 0 15px;
 }
 
-.sidebar .profile-section .avatar {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
+.profile-section .avatar {
+  width: 50px;
+  height: 50px;
   object-fit: cover;
-  margin-bottom: 10px;
-  border: 2px solid #3a4f7a;
 }
 
+
 .sidebar .profile-section h3 {
-  margin: 5px 0;
-  font-size: 16px;
-  font-weight: 600;
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
 
 .sidebar .profile-section .role-badge {

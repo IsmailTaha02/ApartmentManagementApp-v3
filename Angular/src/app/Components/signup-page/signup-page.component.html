@@ -1,0 +1,64 @@
+<app-header></app-header>
+
+<div class="signup-container">
+  <div class="form-section">
+    <div class="form-content">
+      <h2>Create an Account</h2>
+      <p class="subtitle">Join us and find your dream apartment today.</p>
+
+      <form (submit)="onSignup(); $event.preventDefault();">
+        <div class="input-group">
+          <fa-icon [icon]="faUser" class="input-icon"></fa-icon>
+          <input type="text" placeholder="Full Name" [(ngModel)]="fullName" name="fullName" required />
+        </div>
+
+        <div class="input-group">
+          <fa-icon [icon]="faUser" class="input-icon"></fa-icon>
+          <input type="email" placeholder="Email Address" [(ngModel)]="email" name="email" required autocomplete="off"/>
+        </div>
+
+        <div class="input-group">
+          <fa-icon [icon]="faUser" class="input-icon"></fa-icon>
+          <input type="tel" placeholder="Phone Number" [(ngModel)]="phoneNumber" name="phoneNumber" required />
+        </div>
+
+        <div class="input-group">
+          <fa-icon [icon]="faUser" class="input-icon"></fa-icon>
+          <select [(ngModel)]="role" name="role" required>
+            <option value="" disabled selected>Select your role</option>
+            <option value="Buyer/Tenant">Buyer/Tenant</option>
+            <option value="Technician">Technician</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <fa-icon [icon]="faUser" class="input-icon"></fa-icon>
+          <input type="text" placeholder="Job Title (optional)" [(ngModel)]="job" name="job" />
+        </div>
+
+        <div class="input-group">
+          <fa-icon [icon]="faFacebook" class="input-icon"></fa-icon>
+          <input type="url" placeholder="Facebook Link (optional)" [(ngModel)]="facebookLink" name="facebookLink" />
+        </div>
+
+        <div class="input-group">
+          <fa-icon [icon]="faLock" class="input-icon"></fa-icon>
+          <input type="password" placeholder="Password" [(ngModel)]="password" name="password" required autocomplete="new-password"/>
+        </div>
+
+        <button class="btn-signup" type="submit" [disabled]="isSubmitting">
+          {{ isSubmitting ? 'Signing up...' : 'Create Account' }}
+        </button>
+      </form>
+
+      <p *ngIf="errorMessage" class="error-message">{{ errorMessage }}</p>
+    </div>
+  </div>
+
+  <div class="image-section">
+    <div class="overlay">
+      <h1>Join Our Community</h1>
+      <p>Experience easy renting and property management.</p>
+    </div>
+  </div>
+</div>
