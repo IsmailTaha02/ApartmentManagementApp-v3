@@ -117,9 +117,10 @@
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  font-weight: 600;
+  font-weight: 550;
   font-size: 0.95rem;
   transition: background-color 0.3s ease, transform 0.2s ease;
+  margin-top: 20px;
 }
 
 .view-details-btn:hover {
