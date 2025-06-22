@@ -53,20 +53,22 @@
 <!-- Apartment Listings Section -->
 <div class="listing-section">
   <h2>Available apartments for rent</h2>
-  <div class="card-container">
-    <div *ngFor="let apartment of apartments" class="card">
-     <div [routerLink]="['/apartment', apartment.id]" class="card-link"> 
-      <div class="card-image">
-        <img [src]="apartment.photos ? apartment.photos[0] : 'assets/default-image.jpg'"
-         alt="Apartment image" class="card-img">
+  <div class="apartment-grid">
+    <div class="apartment-card" *ngFor="let apartment of apartments">
+      <div [routerLink]="['/apartment', apartment.id]" class="card-clickable">
+        <div class="card-image">
+          <img [src]="apartment.photos ? apartment.photos[0] : 'assets/default-image.jpg'" 
+               alt="Apartment image" class="card-img">
+        </div>
+        <h3>{{ apartment.city }} - {{ apartment.location }} ({{ apartment.unit_number }})</h3>
+        <p><strong>Area:</strong> {{ apartment.area }} m²</p>
+        <p><strong>Rooms:</strong> {{ apartment.number_of_rooms }}</p>
+        <p><strong>Price:</strong> ${{ apartment.price }} per month</p>
+        <div class="view-details-wrapper">
+          <button class="view-details-btn">View Details</button>
+        </div>
       </div>
-      <div class="card-body">
-        <h3>{{ apartment.location }}</h3>
-        <p>{{ apartment.price }}$ per month</p>
-        <p>{{ apartment.number_of_rooms }} bds | {{ apartment.area }} sqft</p>
-        <button class="view-details-btn" [routerLink]="['/apartment', apartment.id]">View Details</button>
-      </div>
-     </div>
     </div>
   </div>
 </div>
+

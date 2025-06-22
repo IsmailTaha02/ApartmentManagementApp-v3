@@ -29,7 +29,7 @@
       <thead>
         <tr>
           <th>User</th>
-          <th>Apartment Location</th>
+          <th>Apartment</th>
           <th>Amount</th>
           <th>Due Date</th>
           <th>Paid Date</th>
@@ -40,7 +40,7 @@
       <tbody>
         <tr *ngFor="let p of filteredPayments">
           <td>{{ p.user?.full_name }}</td>
-          <td>{{ p.apartment.location }}</td>
+          <td>{{ p.apartment.location }} ({{p.apartment.unit_number}})</td>
           <td>${{ p.amount }}</td>
           <td>{{ p.due_date | date }}</td>
           <td>{{ p.paid_date ? (p.paid_date | date) : '—' }}</td>

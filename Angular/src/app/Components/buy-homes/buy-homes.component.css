@@ -40,78 +40,93 @@
   }
   
   /* Apartment Cards Section */
-  .listing-section {
-    padding: 20px;
-
-  }
-
   .listing-section h2 {
-    text-align: center;  /* Centers the text horizontally */
+    margin-left: 600px;
+    text-align: center;
+    font-size: 2rem;
+    font-weight: bold;
+    color: #3f51b5;
+    margin-bottom: 1.5rem;
+    position: relative;
+    display: inline-block;
   }
   
-
-  .card-container {
-    cursor: pointer;
-    display: flex;
-    flex-wrap: wrap;
+  /* Apartment Cards Section */
+  .apartment-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 1.5rem;
     justify-content: center;
   }
   
-  .card {
-    width: 380px;
-    border: 1px solid #ddd;
+  .apartment-card {
+    background: #ffffff;
+    padding: 1.25rem;
     border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     transition: transform 0.2s ease-in-out;
-    background-color: #fff;
+    border-left: 5px solid #3f51b5;
+    cursor: pointer;
   }
   
-  .card:hover {
+  .apartment-card:hover {
     transform: scale(1.05);
+  }
+  
+  .card-clickable {
+    display: block;
+    text-decoration: none;
+    color: inherit;
   }
   
   .card-image {
     width: 100%;
     height: 200px;
     overflow: hidden;
+    margin-bottom: 1rem;
+    border-radius: 6px;
   }
   
   .card-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    border-radius: 6px;
   }
   
-  .card-body {
-    padding: 1rem;
+  .apartment-card h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    color: #1f2937;
     text-align: center;
   }
   
-  .card-body h3 {
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin-bottom: 10px;
+  .apartment-card p {
+    font-size: 0.9rem;
+    margin: 0.25rem 0;
+    color: #444;
+    text-align: center;
   }
   
-  .card-body p {
-    font-size: 1.3rem;
-    color: #000000;
-    margin-bottom: 30px;
+  .view-details-wrapper {
+    margin-top: 12px;
+    text-align: center;
   }
   
   .view-details-btn {
-    padding: 10px;
-    background-color: #007bff;
+    padding: 10px 20px;
+    background-color: #3f51b5;
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
-    font-weight: bold;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: background-color 0.3s ease, transform 0.2s ease;
   }
   
   .view-details-btn:hover {
-    background-color: #0056b3;
+    background-color: #303f9f;
+    transform: translateY(-2px);
   }
   

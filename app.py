@@ -1,3 +1,4 @@
+import re
 import uuid
 from flask import Flask, jsonify, request
 from flask_cors import CORS
@@ -141,6 +142,12 @@ def create_user():
     if not all([full_name, email, phone_number, role, password]):
         return jsonify({'error': 'Missing required fields'}), 400
 
+    email = data.get('email')
+
+    # Validate email format
+    if not email or not is_valid_email(email):
+        return jsonify({'error': 'Invalid email format'}), 400
+    
     # Check if email exists
     if User.query.filter_by(email=email).first():
         return jsonify({'error': 'Email already exists'}), 409
@@ -185,6 +192,10 @@ def create_user():
         return jsonify({'error': 'Internal server error'}), 500
 
 
+def is_valid_email(email: str) -> bool:
+    # Simple regex for email validation
+    email_regex = r'^[\w\.-]+@[\w\.-]+\.\w+$'
+    return bool(re.match(email_regex, email))
 
 
 # Route to get apartments related to a specific user
@@ -259,6 +270,8 @@ def get_apartments():
             'type': a.type,
             'description': a.description,
             'photos': [f"http://localhost:5000/{p}" for p in a.photos] if a.photos else [],
+            'video': f"http://localhost:5000/{a.video}" if a.video else None,   # <-- ADD VIDEO URL
+            'parking_availability': bool(a.parking_availability),
             'status': a.status,
             'created_at': a.created_at,
             'owner': {
@@ -295,8 +308,8 @@ def get_apartment(id):
         'type': apartment.type,
         'description': apartment.description,
         'photos': [f"http://localhost:5000/{p}" for p in apartment.photos] if apartment.photos else [],
-        'parking_availability': getattr(apartment, 'parking_availability', None),
-        'video': getattr(apartment, 'video', None),
+        'parking_availability': bool(apartment.parking_availability),
+        'video': f"http://localhost:5000/{apartment.video}" if apartment.video else None,
         'map_location': getattr(apartment, 'map_location', None),
         'status': apartment.status,
         'created_at': apartment.created_at,

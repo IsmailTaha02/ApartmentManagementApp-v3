@@ -65,10 +65,10 @@
 
 
     <!-- Video -->
-    <div *ngIf="safeVideoUrl">
-      <h3>Video Tour</h3>
-      <iframe [src]="safeVideoUrl" frameborder="0" allowfullscreen></iframe>
-    </div>
+    <!-- <video width="400" controls *ngIf="apartment.video">
+      <source [src]="apartment.video" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>         -->
 
     <!-- Map -->
     <div *ngIf="safeMapUrl">

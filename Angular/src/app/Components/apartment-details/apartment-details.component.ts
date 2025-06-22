@@ -68,8 +68,7 @@ export class ApartmentDetailsComponent implements OnInit {
         this.apartment = data;
         this.selectedStatus = data.status;
         this.mainPhoto = data.photos && data.photos.length > 0 ? data.photos[0] : 'assets/default-image.jpg';
-        this.safeVideoUrl = data.video ? this.sanitizer.bypassSecurityTrustResourceUrl(data.video) : null;
-        this.safeMapUrl = data.map_location ? this.sanitizer.bypassSecurityTrustResourceUrl(data.map_location) : null;
+        console.log(this.apartment.video)
       },
       error: () => {
         this.error = 'Failed to load apartment';
