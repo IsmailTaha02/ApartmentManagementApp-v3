@@ -1,0 +1,47 @@
+.contracts-container {
+    padding: 20px;
+    margin-top: 80px;
+  }
+  
+  .filters {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 20px;
+  }
+  
+  .filters select {
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 8px 15px;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+  }
+  
+  table th, table td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #eee;
+    text-align: left;
+  }
+  
+  table th {
+    background: #f9f9f9;
+  }
+  
+  .details-btn {
+    background: #007bff;
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .details-btn:hover {
+    background: #0056b3;
+  }
+  

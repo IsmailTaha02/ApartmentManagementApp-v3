@@ -42,8 +42,9 @@ export class RentHomesComponent implements OnInit {
     if (this.filterAreaMax !== null) filterQuery += `area_max=${this.filterAreaMax}&`;
     if (this.filterType) filterQuery += `type=${this.filterType}&`;  // Add type filter
 
-    if (filterQuery.endsWith('&')) filterQuery = filterQuery.slice(0, -1);
+    // if (filterQuery.endsWith('&')) filterQuery = filterQuery.slice(0, -1);
 
+    filterQuery += `status=Available`;
     const url = `http://localhost:5000/apartments?${filterQuery}`;
     this.http.get<any[]>(url)
       .subscribe(data => {

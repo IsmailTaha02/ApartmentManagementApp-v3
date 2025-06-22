@@ -37,7 +37,7 @@
       <!-- Full-width image preview + file input -->
       <div class="image-preview-list full-width" *ngIf="uploadedPhotos.length > 0">
         <div *ngFor="let img of uploadedPhotos; let i = index" class="image-preview">
-          <img [src]="getImagePreview(img)" alt="Preview" />
+          <img [src]="img.url" alt="Preview" />
           <div class="remove-icon" (click)="removeNewPhoto(i)">✖</div>
         </div>
       </div>
@@ -46,7 +46,7 @@
     
       <div class="form-actions full-width">
         <button type="submit">Save</button>
-        <button type="button" (click)="showAddForm = false">Cancel</button>
+        <button type="button" (click)="cancelAddForm()">Cancel</button>
       </div>
     </form>
     
@@ -78,7 +78,7 @@
   <div class="apartment-grid">
     <div class="apartment-card" *ngFor="let apt of filteredApartments">
       <!-- Clickable Section -->
-      <div [routerLink]="['/apartment', apt.id]" class="card-clickable">
+      <div [routerLink]="['/owner-dashboard/apartment-details', apt.id]" class="card-clickable">
         <div class="card-image">
           <img [src]="apt.photos?.[0] || 'assets/default-image.jpg'" alt="Apartment image" class="card-img">
         </div>

@@ -3,7 +3,6 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 import os
-from datetime import datetime
 import logging
 from sqlalchemy import exc
 from sqlalchemy.orm import joinedload
@@ -14,8 +13,14 @@ from Classes.User import User
 from Classes.Payment import Payment
 from Classes.Message import Message
 from Classes.Transaction import Transaction
+from Classes.Contract import Contract
+
 from werkzeug.security import generate_password_hash
 import jwt
+
+from functools import wraps
+from datetime import datetime, timedelta
+
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -37,18 +42,6 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-
-with app.app_context():
-    users = User.query.all()
-    updated = 0
-    for user in users:
-        if not (user.password.startswith('scrypt:') or user.password.startswith('pbkdf2:')):
-            user.password = generate_password_hash(user.password, method='scrypt')
-            updated += 1
-            print(f"Updated password for {user.email}")
-    db.session.commit()
-    print(f"Total updated passwords: {updated}")
-    
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
@@ -93,6 +86,31 @@ def validate_and_normalize_status(status):
 # Initialize database
 with app.app_context():
     db.create_all()
+
+
+SECRET_KEY = 'your-secret-key'  # make sure this matches what you use to create tokens!
+
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth_header = request.headers.get('Authorization', None)
+        if not auth_header:
+            return jsonify({'error': 'Token is missing!'}), 401
+        try:
+            token = auth_header.split()[1]
+            payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
+            user_id = payload['user_id']
+            current_user = User.query.get(user_id)
+            if not current_user:
+                return jsonify({'error': 'User not found'}), 401
+        except jwt.ExpiredSignatureError:
+            return jsonify({'error': 'Token expired'}), 401
+        except jwt.InvalidTokenError:
+            return jsonify({'error': 'Invalid token'}), 401
+        except Exception as e:
+            return jsonify({'error': f'Error decoding token: {str(e)}'}), 401
+        return f(current_user, *args, **kwargs)
+    return decorated
 
 
 #############Users Route#######################
@@ -191,7 +209,6 @@ def get_user_apartments(user_id):
     } for apt in apartments])
 
 
-
 ###Route to get all apartments and apply filters on them
 @app.route('/apartments')
 def get_apartments():
@@ -202,9 +219,12 @@ def get_apartments():
     area_min = request.args.get('area_min', type=int)
     area_max = request.args.get('area_max', type=int)
     apt_type = request.args.get('type', type=str)
-
+    unit_number = request.args.get('unit_number', type=str)
+    status = request.args.get('status', type=str)
     query = Apartment.query
 
+    if status:
+        query = query.filter(Apartment.status.ilike(f'%{status}%'))
     if apt_type:
         query = query.filter(Apartment.type.ilike(f'%{apt_type}%'))
     if price_min:
@@ -219,33 +239,49 @@ def get_apartments():
         query = query.filter(Apartment.area >= area_min)
     if area_max:
         query = query.filter(Apartment.area <= area_max)
+    if unit_number:
+        query = query.filter(Apartment.unit_number.ilike(f'%{unit_number}%'))
 
     apartments = query.all()
 
-    return jsonify([{
-        'id': a.id,
-        'owner_id': a.owner_id,
-        'location': a.location,
-        'price': a.price,
-        'city': a.city,
-        'unit_number': a.unit_number,
-        'area': a.area,
-        'number_of_rooms': a.number_of_rooms,
-        'type': a.type,
-        'description': a.description,
-        'photos': [f"http://localhost:5000/{p}" for p in a.photos] if a.photos else [],
-        'status': a.status,
-        'created_at': a.created_at
-    } for a in apartments])
+    result = []
+    for a in apartments:
+        owner = a.owner  
+        result.append({
+            'id': a.id,
+            'owner_id': a.owner_id,
+            'location': a.location,
+            'price': a.price,
+            'city': a.city,
+            'unit_number': a.unit_number,
+            'area': a.area,
+            'number_of_rooms': a.number_of_rooms,
+            'type': a.type,
+            'description': a.description,
+            'photos': [f"http://localhost:5000/{p}" for p in a.photos] if a.photos else [],
+            'status': a.status,
+            'created_at': a.created_at,
+            'owner': {
+                'id': owner.id,
+                'full_name': owner.full_name,
+                'email': owner.email,
+                'phone_number': owner.phone_number
+            } if owner else None
+        })
+
+    return jsonify(result)
+
 
 
 
 ###Route to get spsfc app
 @app.route('/apartments/<int:id>', methods=['GET'])
 def get_apartment(id):
-    apartment = Apartment.query.get(id)
-    if not apartment:
-        return jsonify({'error': 'Apartment not found'}), 404
+    apartment = Apartment.query.get_or_404(id)
+
+    transaction = None
+    if apartment.status in ['Sold', 'Rented','Available']:
+        transaction = Transaction.query.filter_by(apartment_id=apartment.id).first()
 
     return jsonify({
         'id': apartment.id,
@@ -263,8 +299,16 @@ def get_apartment(id):
         'video': getattr(apartment, 'video', None),
         'map_location': getattr(apartment, 'map_location', None),
         'status': apartment.status,
-        'created_at': apartment.created_at
+        'created_at': apartment.created_at,
+        'owner': {
+            'id': apartment.owner.id,
+            'full_name': apartment.owner.full_name,
+            'email': apartment.owner.email,
+            'phone_number': apartment.owner.phone_number
+        } if apartment.owner else None,
+        'buyer': transaction.user.to_dict() if transaction else None
     })
+
 
 @app.route('/api/maintenance-requests', methods=['GET'])
 def get_maintenance_requests():
@@ -452,6 +496,7 @@ def get_technician_stats(technician_id):
     })
 
 from werkzeug.security import check_password_hash
+SECRET_KEY = 'YOUR_SECRET_KEY'  # Use a real secret key, or load from env
 
 @app.route('/api/login', methods=['POST'])
 def login():
@@ -462,6 +507,13 @@ def login():
     user = User.query.filter_by(email=email).first()
 
     if user and check_password_hash(user.password, password):
+        token = jwt.encode({
+            'user_id': user.id,
+            'email': user.email,
+            'role': user.role,
+            'exp': datetime.utcnow() + timedelta(hours=12)
+        }, SECRET_KEY, algorithm='HS256')
+
         return jsonify({
             'message': 'Login successful',
             'user': {
@@ -470,10 +522,13 @@ def login():
                 'email': user.email,
                 'role': user.role,
                 'is_verified': user.is_verified
-            }
+            },
+            'token': token
         }), 200
+
     else:
         return jsonify({'error': 'Invalid email or password'}), 401
+
 
 
 
@@ -722,6 +777,270 @@ def send_message():
     except Exception as e:
         print(f"Error in /messages: {e}")
         return jsonify({"error": str(e)}), 500
+
+
+
+##################CONTRACTS ROUTES###################3
+@app.route('/contracts', methods=['GET'])
+def get_contracts():
+    # Optional filters
+    buyer_id = request.args.get('user_id', type=int)
+    owner_id = request.args.get('owner_id', type=int)
+    apartment_id = request.args.get('apartment_id', type=int)
+    contract_type = request.args.get('contract_type', type=str)
+    status = request.args.get('status', type=str)
+
+    query = Contract.query
+
+    if status == 'signed':
+        query = query.filter(Contract.signed_by_buyer == True, Contract.signed_by_owner == True)
+    elif status == 'pending':
+        query = query.filter(
+            (Contract.signed_by_buyer != True) | (Contract.signed_by_owner != True)
+        )
+    
+    if buyer_id:
+        query = query.filter(Contract.buyer_id == buyer_id)
+    if owner_id:
+        query = query.filter(Contract.owner_id == owner_id)
+    if apartment_id:
+        query = query.filter(Contract.apartment_id == apartment_id)
+    if contract_type:
+        query = query.filter(Contract.contract_type == contract_type)
+
+    contracts = query.all()
+
+    result = []
+    for c in contracts:
+        result.append({
+            'id': c.id,
+            'apartment_id': c.apartment_id,
+            'apartment_location': c.apartment.location if c.apartment else None,
+            'buyer_id': c.buyer_id,
+            'buyer_name': c.buyer.full_name if c.buyer else None,
+            'owner_id': c.owner_id,
+            'owner_name': c.owner.full_name if c.owner else None,
+            'contract_type': c.contract_type,
+            'signed_by_buyer': c.signed_by_buyer,
+            'signed_by_owner': c.signed_by_owner,
+            'created_at': c.created_at,
+            'finalized_at': c.finalized_at
+        })
+
+    return jsonify(result)
+
+
+@app.route('/contracts/<int:id>', methods=['GET'])
+def get_contract(id):
+    contract = Contract.query.get(id)
+    if not contract:
+        return jsonify({'error': 'Contract not found'}), 404
+
+    apartment = contract.apartment
+    buyer = contract.buyer
+    owner = contract.owner
+
+    return jsonify({
+        'id': contract.id,
+        'apartment_id': contract.apartment_id,
+        'apartment': {
+            'location': apartment.location if apartment else None,
+            'unit_number': apartment.unit_number if apartment else None,
+            'area': float(apartment.area) if apartment else None,
+            'number_of_rooms': apartment.number_of_rooms if apartment else None,
+            'type': apartment.type if apartment else None,
+            'description': apartment.description if apartment else None,
+            'price': apartment.price if apartment else None,
+            'parking_availability': bool(apartment.parking_availability) if apartment else None,
+            'status': apartment.status if apartment else None,
+            'created_at': apartment.created_at.isoformat() if apartment else None,
+            'city': apartment.city if apartment else None
+        },
+        'buyer': {
+            'id': buyer.id if buyer else None,
+            'full_name': buyer.full_name if buyer else None,
+            'email': buyer.email if buyer else None,
+            'phone_number': buyer.phone_number if buyer else None,
+            'role': buyer.role if buyer else None,
+            'job': buyer.job if buyer else None,
+            'facebook_link': buyer.facebook_link if buyer else None,
+            'is_verified': bool(buyer.is_verified) if buyer else None,
+            'created_at': buyer.created_at.isoformat() if buyer else None
+        },
+        'owner': {
+            'id': owner.id if owner else None,
+            'full_name': owner.full_name if owner else None,
+            'email': owner.email if owner else None,
+            'phone_number': owner.phone_number if owner else None,
+            'role': owner.role if owner else None,
+            'job': owner.job if owner else None,
+            'facebook_link': owner.facebook_link if owner else None,
+            'is_verified': bool(owner.is_verified) if owner else None,
+            'created_at': owner.created_at.isoformat() if owner else None
+        },
+        'contract_type': contract.contract_type,
+        'contract_details': contract.contract_details,
+        'signed_by_buyer': bool(contract.signed_by_buyer),
+        'signed_by_owner': bool(contract.signed_by_owner),
+        'created_at': contract.created_at.isoformat() if contract.created_at else None,
+        'finalized_at': contract.finalized_at.isoformat() if contract.finalized_at else None
+    })
+
+
+@app.route('/customer-contracts', methods=['GET'])
+@token_required  # Assuming you have auth
+def get_customer_contracts(current_user):
+    if current_user.role != 'Buyer/Tenant':
+        return jsonify({'error': 'Unauthorized'}), 403
+
+    query = Contract.query.filter_by(buyer_id=current_user.id)
+
+    status = request.args.get('status')
+    if status == 'signed':
+        query = query.filter(Contract.signed_by_buyer == True, Contract.signed_by_owner == True)
+    elif status == 'pending':
+        query = query.filter((Contract.signed_by_buyer == False) | (Contract.signed_by_owner == False))
+
+    contracts = query.all()
+
+    return jsonify([{
+        'id': c.id,
+        'apartment_location': c.apartment.location if c.apartment else '',
+        'contract_type': c.contract_type,
+        'created_at': c.created_at,
+        'signed_by_owner': c.signed_by_owner,
+        'signed_by_buyer': c.signed_by_buyer
+    } for c in contracts])
+
+
+SECRET_KEY = 'your-secret-key'  # make sure this matches what you use to create tokens!
+
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth_header = request.headers.get('Authorization', None)
+        if not auth_header:
+            return jsonify({'error': 'Token is missing!'}), 401
+        try:
+            token = auth_header.split()[1]
+            payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
+            user_id = payload['user_id']
+            current_user = User.query.get(user_id)
+            if not current_user:
+                return jsonify({'error': 'User not found'}), 401
+        except jwt.ExpiredSignatureError:
+            return jsonify({'error': 'Token expired'}), 401
+        except jwt.InvalidTokenError:
+            return jsonify({'error': 'Invalid token'}), 401
+        except Exception as e:
+            return jsonify({'error': f'Error decoding token: {str(e)}'}), 401
+        return f(current_user, *args, **kwargs)
+    return decorated
+
+
+
+@app.route('/contracts', methods=['POST'])
+def create_contract():
+    data = request.get_json()
+
+    required_fields = ['apartment_id', 'buyer_id', 'owner_id', 'contract_type', 'contract_details']
+    if not all(field in data for field in required_fields):
+        return jsonify({'error': 'Missing required fields'}), 400
+
+    contract = Contract(
+        apartment_id=data['apartment_id'],
+        buyer_id=data['buyer_id'],
+        owner_id=data['owner_id'],
+        contract_type=data['contract_type'],
+        contract_details=data['contract_details']
+    )
+
+    db.session.add(contract)
+    db.session.commit()
+
+    return jsonify({'message': 'Contract created', 'id': contract.id}), 201
+
+
+#######Routes to get and assign/remove apartment to as specific user
+@app.route('/api/potential-buyers-tenants')
+def potential_buyers_tenants():
+    users = User.query.filter(User.role == 'Buyer/Tenant').all()
+    return jsonify([user.to_dict() for user in users])
+
+@app.route('/api/assign-apartment', methods=['POST'])
+def assign_apartment():
+    data = request.get_json()
+    apartment_id = data.get('apartment_id')
+    user_id = data.get('user_id')
+
+    apartment = Apartment.query.get(apartment_id)
+    if not apartment:
+        return jsonify({'error': 'Apartment not found'}), 404
+
+    if apartment.status not in ['Sold', 'Rented']:
+        return jsonify({'error': 'Apartment must be Sold or Rented'}), 400
+
+    # Create transaction
+    transaction = Transaction(user_id=user_id, apartment_id=apartment_id)
+    db.session.add(transaction)
+    db.session.commit()
+
+    return jsonify({'message': 'Apartment assigned to user successfully'})
+
+
+@app.route('/apartments/<int:apartment_id>/status-with-transaction', methods=['POST'])
+def update_status(apartment_id):
+    try:
+        data = request.json
+        transaction_type = data.get('transaction_type')
+        transaction_data = data.get('transaction')
+        userId = data.get('buyerId')
+
+        apartment = Apartment.query.get_or_404(apartment_id)
+
+        # Update status
+        if transaction_type == "Rent":
+            apartment.status = "Rented"
+        elif transaction_type == "Sale":
+            apartment.status = "Sold"
+        else:
+            apartment.status = "Available"    
+
+        print(f"📌 transaction_type: {transaction_type}")
+        print(f"📌 transaction_data: {transaction_data}")
+        print(f"📌 buyerId: {userId}")
+
+        # Add transaction if provided
+        if transaction_data:
+            transaction = Transaction(
+                apartment_id=apartment_id,
+                user_id=userId,
+                amount=transaction_data['amount'],
+                transaction_type=transaction_type,  # FIXED: correct type
+                payment_method=transaction_data['payment_method'],
+                status='Completed'
+            )
+            db.session.add(transaction)
+
+        db.session.commit()
+        return jsonify({'message': 'Status and transaction updated'})
+    
+    except Exception as e:
+        db.session.rollback()
+        print(f"❌ DB ERROR: {e}")
+        return jsonify({'message': 'Database error', 'error': str(e)}), 500
+
+
+
+
+
+@app.route('/api/remove-apartment-buyer', methods=['POST'])
+def remove_apartment_buyer():
+    data = request.get_json()
+    Transaction.query.filter_by(apartment_id=data['apartment_id']).delete()
+    db.session.commit()
+    return jsonify({'message': 'Buyer/tenant removed'})
+
 
 
 if __name__ == '__main__':

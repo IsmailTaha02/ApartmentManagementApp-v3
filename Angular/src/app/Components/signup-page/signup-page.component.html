@@ -22,7 +22,7 @@
           <input type="tel" placeholder="Phone Number" [(ngModel)]="phoneNumber" name="phoneNumber" required />
         </div>
 
-        <div class="input-group">
+        <div class="input-group" *ngIf="!forcedRole">
           <fa-icon [icon]="faUser" class="input-icon"></fa-icon>
           <select [(ngModel)]="role" name="role" required>
             <option value="" disabled selected>Select your role</option>
@@ -30,7 +30,12 @@
             <option value="Technician">Technician</option>
           </select>
         </div>
-
+        
+        <!-- <div class="input-group" *ngIf="forcedRole">
+          <fa-icon [icon]="faUser" class="input-icon"></fa-icon>
+          <input type="text" [value]="forcedRole" disabled />
+        </div> -->
+        
         <div class="input-group">
           <fa-icon [icon]="faUser" class="input-icon"></fa-icon>
           <input type="text" placeholder="Job Title (optional)" [(ngModel)]="job" name="job" />

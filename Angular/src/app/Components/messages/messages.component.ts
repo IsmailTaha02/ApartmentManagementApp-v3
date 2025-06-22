@@ -43,21 +43,37 @@ export class MessagesComponent implements OnInit {
   }
   
   initiateContactWithOwner(apartmentId: number): void {
-    const newMsg = {
-      sender_id: this.userId,
-      apartment_id: apartmentId,
-      content: 'Hello, I would like to contact you regarding your apartment.'
-    };
+    // Step 1: Get apartment details
+    this.http.get(`http://localhost:5000/apartments/${apartmentId}`).subscribe({
+      next: (apartment: any) => {
+        // Step 2: Compose message content including location, city, unit_number
+        const messageContent = `Hello, I would like to contact you regarding your apartment at ${apartment.location}, ${apartment.city}, Unit: ${apartment.unit_number}.`;
   
-    this.http.post('http://localhost:5000/messages', newMsg).subscribe(() => {
-      this.loadMessages(); // refresh and show the chat
+        const newMsg = {
+          sender_id: this.userId,
+          apartment_id: apartmentId,
+          content: messageContent,
+          location: apartment.location,
+          city: apartment.city,
+          unit_number: apartment.unit_number
+        };
+  
+        // Step 3: Send message with extra details
+        this.http.post('http://localhost:5000/messages', newMsg).subscribe(() => {
+          this.loadMessages(); // refresh and show the chat
+        });
+      },
+      error: (err) => {
+        console.error('Failed to fetch apartment details:', err);
+        // Fallback to simpler message or handle error as you want
+      }
     });
-
+  
+    // Clear query param from URL after use
     this.router.navigate([], {
       queryParams: { apartmentId: null },
       queryParamsHandling: 'merge'
     });
-    
   }  
 
   loadMessages(): void {

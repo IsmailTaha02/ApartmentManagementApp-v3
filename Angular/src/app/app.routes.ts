@@ -125,6 +125,7 @@ export const routes: Route[] = [
             m => m.CustomerApartmentsComponent
           )
       },
+    
     ]
   },
 
@@ -182,6 +183,27 @@ export const routes: Route[] = [
             m => m.CustomerApartmentsComponent
           )
       },
+      {
+        path: 'customer-contracts',
+        loadComponent: () =>
+          import('./Components/ContractSection/customer-contracts/customer-contracts.component').then(
+            m => m.CustomerContractsComponent
+          )
+      },
+      {
+        path: 'contract-details/:id',
+        loadComponent: () =>
+          import('./Components/ContractSection/contract-details/contract-details.component').then(
+            m => m.ContractDetailsComponent
+          )
+      },
+      {
+        path: 'apartment-details/:id',
+        loadComponent: () =>
+          import('./Components/apartment-details/apartment-details.component').then(
+            m => m.ApartmentDetailsComponent
+          )
+      },
     ]
   },
 
@@ -229,6 +251,34 @@ export const routes: Route[] = [
         loadComponent: () =>
           import('./Components/ApartmentsSection/admin-apartments/admin-apartments.component').then(
             m => m.AdminApartmentsComponent
+          )
+      },
+      {
+        path: 'admin-contracts',
+        loadComponent: () =>
+          import('./Components/ContractSection/owner-contracts/owner-contracts.component').then(
+            m => m.OwnerContractsComponent
+          )
+      },
+      {
+        path: 'contract-details/:id',
+        loadComponent: () =>
+          import('./Components/ContractSection/contract-details/contract-details.component').then(
+            m => m.ContractDetailsComponent
+          )
+      },
+      {
+        path: 'create-contract',
+        loadComponent: () =>
+          import('./Components/ContractSection/create-contract/create-contract.component').then(
+            m => m.CreateContractComponent
+          )
+      },
+      {
+        path: 'apartment-details/:id',
+        loadComponent: () =>
+          import('./Components/apartment-details/apartment-details.component').then(
+            m => m.ApartmentDetailsComponent
           )
       },
 

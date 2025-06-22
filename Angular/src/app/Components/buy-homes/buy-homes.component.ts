@@ -34,21 +34,22 @@ export class BuyHomesComponent implements OnInit {
 
   getApartments(): void {
     let filterQuery = '';
-
-    // Apply filters only if they are not null or undefined
+  
     if (this.filterPriceMin !== null) filterQuery += `price_min=${this.filterPriceMin}&`;
     if (this.filterPriceMax !== null) filterQuery += `price_max=${this.filterPriceMax}&`;
     if (this.filterLocation) filterQuery += `location=${this.filterLocation}&`;
     if (this.filterAreaMin !== null) filterQuery += `area_min=${this.filterAreaMin}&`;
     if (this.filterAreaMax !== null) filterQuery += `area_max=${this.filterAreaMax}&`;
-    if (this.filterType) filterQuery += `type=${this.filterType}&`;  // Add type filter
-
-    if (filterQuery.endsWith('&')) filterQuery = filterQuery.slice(0, -1);
-
+    if (this.filterType) filterQuery += `type=${this.filterType}&`;
+  
+    // Always include status=Available
+    filterQuery += `status=Available`;
+  
     const url = `http://localhost:5000/apartments?${filterQuery}`;
     this.http.get<any[]>(url)
       .subscribe(data => {
         this.apartments = data;
       });
   }
+  
 }

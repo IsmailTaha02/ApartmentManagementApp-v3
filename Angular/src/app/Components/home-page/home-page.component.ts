@@ -23,7 +23,9 @@ export class HomePageComponent implements OnInit {
 
   // Fetch new listings from the backend
   getNewListings() {
-    this.http.get<any[]>('http://localhost:5000/apartments')  // Replace with your actual Flask API endpoint
+    let filterQuery = '';
+    filterQuery += `status=Available`;
+    this.http.get<any[]>(`http://localhost:5000/apartments?${filterQuery}`)  
       .subscribe(data => {
         this.apartments = data;  // Assign the fetched apartments data to the apartments array
       });

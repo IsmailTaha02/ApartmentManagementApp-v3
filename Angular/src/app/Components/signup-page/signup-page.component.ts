@@ -46,6 +46,17 @@ export class SignupPageComponent {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
+  forcedRole: string | null = null;
+
+  ngOnInit(): void {
+    this.forcedRole = this.route.snapshot.queryParamMap.get('forcedRole');
+    console.log(this.forcedRole);
+    if (this.forcedRole) {
+      console.log("yes");
+      this.role = this.forcedRole;
+    }
+  }
+
   // Signup method
   onSignup() {
     this.errorMessage = '';
@@ -56,7 +67,7 @@ export class SignupPageComponent {
       full_name: this.fullName,
       email: this.email,
       phone_number: this.phoneNumber,
-      role: this.role,
+      role:this.role,
       job: this.job || null,
       facebook_link: this.facebookLink || null,
       password: this.password

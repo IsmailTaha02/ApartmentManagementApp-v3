@@ -109,4 +109,36 @@ export class ApiService {
       })
     };
   }
+
+  getPotentialBuyersOrTenants() {
+    return this.http.get<any[]>('http://localhost:5000/api/potential-buyers-tenants');
+  }
+  
+  updateApartmentStatusWithTransaction(apartmentId: number, payload: { 
+    transaction_type: string, 
+    transaction: {
+      amount: number,
+      // transaction_type: 'Rent' | 'Sale',
+      payment_method: 'Visa' | 'MasterCard' | 'Cash'
+    } | null
+    buyerId: number | null 
+  }) {
+    return this.http.post(`http://localhost:5000/apartments/${apartmentId}/status-with-transaction`, payload);
+  }
+  
+  
+  assignApartmentToUser(apartmentId: number, userId: number) {
+    return this.http.post(`http://localhost:5000/api/assign-apartment`, {
+      apartment_id: apartmentId,
+      user_id: userId
+    });
+  }
+  
+  removeApartmentBuyer(apartmentId: number) {
+    return this.http.post(`http://localhost:5000/api/remove-apartment-buyer`, {
+      apartment_id: apartmentId
+    });
+  }
+  
+  
 }

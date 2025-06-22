@@ -1,0 +1,63 @@
+<app-contract-topbar></app-contract-topbar>
+
+<div class="contracts-container">
+
+  <div class="filters">
+    <select [(ngModel)]="selectedStatus" (change)="loadContracts()">
+      <option value="">All Statuses</option>
+      <option value="signed">Signed</option>
+      <option value="pending">Pending</option>
+    </select>
+
+    <select [(ngModel)]="selectedUser" (change)="loadContracts()">
+      <option value="">Select or search user</option>
+      <option *ngFor="let user of users" [value]="user.id">{{user.full_name}}</option>
+    </select>
+
+    <select [(ngModel)]="selectedApartment" (change)="loadContracts()">
+      <option value="">Select or search apartment</option>
+      <option *ngFor="let apt of apartments" [value]="apt.id">{{apt.location}}</option>
+    </select>
+
+    <select [(ngModel)]="selectedType" (change)="loadContracts()">
+      <option value="">Select type</option>
+      <option *ngFor="let type of contractTypes" [value]="type">{{ type }}</option>
+    </select>
+    
+    <button class="create-btn" (click)="createContract()">+ Create Contract</button>
+
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>User</th>
+        <th>Apartment</th>
+        <th>Type</th>
+        <th>Date</th>
+        <th>Signed by owner</th>
+        <th>Signed by customer</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let contract of contracts">
+        <td>{{ contract.buyer_name }}</td>
+        <td>{{ contract.apartment_location }}</td>
+        <td>{{ contract.contract_type }}</td>
+        <td>{{ contract.created_at | date:'mediumDate' }}</td>
+        <td [ngStyle]="{'color': contract.signed_by_owner ? 'green' : 'red'}">
+          {{ contract.signed_by_owner ? 'Signed' : 'Pending' }}
+        </td>
+        <td [ngStyle]="{'color': contract.signed_by_buyer ? 'green' : 'red'}">
+          {{ contract.signed_by_buyer ? 'Signed' : 'Pending' }}
+        </td>
+        <td>
+          <button class="details-btn" (click)="viewDetails(contract)">Details</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+

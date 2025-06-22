@@ -1,0 +1,52 @@
+<app-contract-topbar></app-contract-topbar>
+
+<div class="contract-container" *ngIf="selectedContractDetails" id="contract-content">
+  <h1>Contract #{{ selectedContractDetails.id }}</h1>
+
+  <div class="contract-header">
+    <div><strong>Type:</strong> {{ selectedContractDetails.contract_type }}</div>
+    <div><strong>Date:</strong> {{ selectedContractDetails.created_at | date: 'mediumDate' }}</div>
+  </div>
+
+  <div class="party-section">
+    <div><strong>Owner:</strong> {{ selectedContractDetails.owner.full_name }}</div>
+    <div><strong>Buyer:</strong> {{ selectedContractDetails.buyer.full_name }}</div>
+  </div>
+
+  <div class="description-box">
+    <h3>Description</h3>
+    <p>{{ selectedContractDetails.contract_details }}</p>
+  </div>
+
+  <div class="apartment-section">
+    <h3>Apartment Details</h3>
+    <p><strong>Location:</strong> {{ selectedContractDetails.apartment.location }}</p>
+    <p><strong>Price:</strong> ${{ selectedContractDetails.apartment.price }}</p>
+    <p><strong>Area:</strong> {{ selectedContractDetails.apartment.area }} sqm</p>
+  </div>
+
+  <div class="signatures">
+    <div>
+      <strong>Owner Signature:</strong>
+      <span [class.signed]="selectedContractDetails.signed_by_owner">
+        {{ selectedContractDetails.signed_by_owner ? 'Signed' : 'Pending' }}
+      </span>
+    </div>
+    <div>
+      <strong>Buyer Signature:</strong>
+      <span [class.signed]="selectedContractDetails.signed_by_buyer">
+        {{ selectedContractDetails.signed_by_buyer ? 'Signed' : 'Pending' }}
+      </span>
+    </div>
+  </div>
+</div>
+
+<div class="button-bar" *ngIf="selectedContractDetails">
+  <button class="back-btn" (click)="goBack()">Go Back</button>
+  <button class="print-btn" (click)="printContract()">Print</button>
+  <button class="download-btn" (click)="downloadContract()">Download</button>
+</div>
+
+<div *ngIf="!selectedContractDetails">
+  <p>Loading contract details...</p>
+</div>

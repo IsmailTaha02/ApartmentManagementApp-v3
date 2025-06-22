@@ -167,58 +167,67 @@ export class AdminApartmentsComponent implements OnInit {
     owner_id: 1 // Example static owner ID; adjust later based on auth
   };
 
-uploadedPhotos: File[] = [];
+// Instead of plain File[]
+uploadedPhotos: { file: File, url: string }[] = [];
 
 // Handle file upload (append to array instead of replacing)
-handleNewPhotoUpload(event: Event) {
+handleNewPhotoUpload(event: Event): void {
   const input = event.target as HTMLInputElement;
   if (input.files) {
     const files = Array.from(input.files);
 
-    // Filter out duplicates
-    const existingFileNames = this.uploadedPhotos.map(f => f.name);
-    const newUniqueFiles = files.filter(f => !existingFileNames.includes(f.name));
-
-    this.uploadedPhotos.push(...newUniqueFiles);
+    files.forEach(file => {
+      // Prevent duplicates by file name (optional)
+      if (!this.uploadedPhotos.some(p => p.file.name === file.name)) {
+        const url = URL.createObjectURL(file);
+        this.uploadedPhotos.push({ file, url });
+      }
+    });
   }
-}
-
-// Create a preview URL for a file
-getImagePreview(file: File): string {
-  return URL.createObjectURL(file);
 }
 
 // Remove a selected photo before submission
 removeNewPhoto(index: number): void {
-  this.uploadedPhotos.splice(index, 1);
+  const removed = this.uploadedPhotos.splice(index, 1)[0];
+  if (removed && removed.url) {
+    URL.revokeObjectURL(removed.url);
+  }
+}
+
+cancelAddForm(): void {
+  this.uploadedPhotos.forEach(p => URL.revokeObjectURL(p.url));
+  this.uploadedPhotos = [];
+  this.showAddForm = false;
 }
 
 addSuccess: boolean = false;
 // Form submission
-submitNewApartment() {
+submitNewApartment(): void {
   const formData = new FormData();
   for (let key in this.newApartment) {
     formData.append(key, this.newApartment[key]);
   }
 
-  this.uploadedPhotos.forEach(file => {
-    formData.append('photos', file);
+  this.uploadedPhotos.forEach(p => {
+    formData.append('photos', p.file);
   });
 
   this.http.post('http://localhost:5000/apartments', formData).subscribe({
     next: () => {
       this.addSuccess = true;
       this.showAddForm = false;
-      this.loadApartments(); // reload updated list
+      this.loadApartments();
+
+      // Cleanup URLs
+      this.uploadedPhotos.forEach(p => URL.revokeObjectURL(p.url));
       this.uploadedPhotos = [];
 
-      setTimeout(() => this.addSuccess = false, 3000); // Auto-hide
+      setTimeout(() => this.addSuccess = false, 3000);
     },
     error: err => {
       console.error('Failed to add apartment', err);
     }
   });
 }
-
 
 }

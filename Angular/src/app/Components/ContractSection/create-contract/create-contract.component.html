@@ -1,0 +1,50 @@
+<app-contract-topbar></app-contract-topbar>
+
+<div class="create-contract-container">
+  <h1>Create New Contract</h1>
+
+  <form (ngSubmit)="submitContract()" #contractForm="ngForm">
+
+    <div class="form-group">
+      <label>Contract Type</label>
+      <select required [(ngModel)]="contractData.contract_type" name="contract_type" #type="ngModel">
+        <option *ngFor="let type of contractTypes" [value]="type">{{ type }}</option>
+      </select>
+      <div *ngIf="type.invalid && type.touched" class="error">Contract type is required</div>
+    </div>
+
+    <div class="form-group">
+      <label>Owner</label>
+      <select required [(ngModel)]="contractData.owner_id" name="owner_id" #owner="ngModel">
+        <option *ngFor="let user of owners" [value]="user.id">{{ user.full_name }}</option>
+      </select>
+      <div *ngIf="owner.invalid && owner.touched" class="error">Owner is required</div>
+    </div>
+
+    <div class="form-group">
+      <label>Buyer</label>
+      <select required [(ngModel)]="contractData.buyer_id" name="buyer_id" #buyer="ngModel">
+        <option *ngFor="let user of buyers" [value]="user.id">{{ user.full_name }}</option>
+      </select>
+      <div *ngIf="buyer.invalid && buyer.touched" class="error">Buyer is required</div>
+    </div>
+
+    <div class="form-group">
+      <label>Apartment</label>
+      <select required [(ngModel)]="contractData.apartment_id" name="apartment_id" #apartment="ngModel">
+        <option *ngFor="let apt of apartments" [value]="apt.id">{{ apt.location }} ({{ apt.unit_number }})</option>
+      </select>
+      <div *ngIf="apartment.invalid && apartment.touched" class="error">Apartment is required</div>
+    </div>
+
+    <div class="form-group">
+      <label>Description / Details</label>
+      <textarea required [(ngModel)]="contractData.contract_details" name="contract_details" #details="ngModel"></textarea>
+      <div *ngIf="details.invalid && details.touched" class="error">Description is required</div>
+    </div>
+
+    <button type="submit" class="submit-btn" [disabled]="contractForm.invalid">Create Contract</button>
+
+  </form>
+
+</div>

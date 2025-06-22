@@ -6,12 +6,14 @@ import { CommonModule } from '@angular/common';
 import { HeaderComponent } from '../header/header.component';
 import { AuthService } from '../../Services/auth.service';
 import { MatDialog } from '@angular/material/dialog';
-import { ContactLoginPromptComponent } from '../contact-login-prompt/contact-login-prompt.component'; 
+import { ContactLoginPromptComponent } from '../contact-login-prompt/contact-login-prompt.component';
+import { ApartmentTopbarComponent } from "../TopBar/apartment-topbar/apartment-topbar.component"; 
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-apartment-details',
   standalone: true,
-  imports: [CommonModule, HeaderComponent],
+  imports: [CommonModule, HeaderComponent, ApartmentTopbarComponent, FormsModule],
   templateUrl: './apartment-details.component.html',
   styleUrls: ['./apartment-details.component.css']
 })
@@ -21,7 +23,18 @@ export class ApartmentDetailsComponent implements OnInit {
   mainPhoto: string = 'assets/default-image.jpg';
   safeVideoUrl: SafeResourceUrl | null = null;
   safeMapUrl: SafeResourceUrl | null = null;
-  isLoggedIn: boolean = false;
+  isLoggedIn = false;
+  role: string | null = null;
+
+  selectedUserId: number | null = null;
+  potentialUsers: any[] = [];
+  selectedStatus = '';
+
+  transactionData = {
+    amount: null as number | null,
+    // transaction_type: 'Rent' as 'Rent' | 'Sale',
+    payment_method: 'Visa' as 'Visa' | 'MasterCard' | 'Cash'
+  };
 
   constructor(
     private route: ActivatedRoute,
@@ -33,39 +46,106 @@ export class ApartmentDetailsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Subscribe to auth changes
     this.authService.currentUser$.subscribe(user => {
       this.isLoggedIn = !!user;
     });
 
-    // Load apartment
-    const apartmentId = this.route.snapshot.paramMap.get('id');
+    const apartmentId = Number(this.route.snapshot.paramMap.get('id'));
     if (apartmentId) {
-      this.fetchApartmentDetails(Number(apartmentId));
+      this.fetchApartmentDetails(apartmentId);
+    }
+
+    this.role = localStorage.getItem('role');
+
+    if (this.role === 'Owner' || this.role === 'Administrator') {
+      this.loadPotentialUsers();
     }
   }
 
   fetchApartmentDetails(id: number): void {
     this.apiService.getApartment(id).subscribe({
-      next: (data: any) => {
-        console.log("✅ Apartment Data Received:", data);
+      next: (data) => {
         this.apartment = data;
-        this.error = null;
-
-        this.mainPhoto = this.apartment.photos?.[0] || 'assets/default-image.jpg';
-
-        if (this.apartment.video) {
-          this.safeVideoUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.apartment.video);
-        }
-
-        if (this.apartment.map_location) {
-          this.safeMapUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.apartment.map_location);
-        }
+        this.selectedStatus = data.status;
+        this.mainPhoto = data.photos && data.photos.length > 0 ? data.photos[0] : 'assets/default-image.jpg';
+        this.safeVideoUrl = data.video ? this.sanitizer.bypassSecurityTrustResourceUrl(data.video) : null;
+        this.safeMapUrl = data.map_location ? this.sanitizer.bypassSecurityTrustResourceUrl(data.map_location) : null;
       },
-      error: (err) => {
-        console.error('❌ Error fetching apartment:', err);
-        this.error = "Failed to load apartment details. Please try again.";
+      error: () => {
+        this.error = 'Failed to load apartment';
       }
+    });
+  }
+
+  loadPotentialUsers(): void {
+    this.apiService.getPotentialBuyersOrTenants().subscribe({
+      next: (users) => this.potentialUsers = users,
+      error: () => console.error('Failed to load potential users')
+    });
+  }
+
+  submitStatusUpdate(): void {
+    if (!this.apartment) return;
+
+    const isSoldOrRented = this.selectedStatus === 'Sale' || this.selectedStatus === 'Rent';
+
+    // Validation
+    if (isSoldOrRented) {
+      if (
+        this.transactionData.amount === null ||
+        // !this.transactionData.transaction_type ||
+        !this.transactionData.payment_method
+      ) {
+        alert('Please fill all transaction details.');
+        return;
+      }
+      if (!this.selectedUserId) {
+        alert('Please select a buyer/tenant.');
+        return;
+      }
+    }
+
+    // Prepare payload
+    const payload = {
+      transaction_type: this.selectedStatus,
+      transaction: isSoldOrRented
+        ? {
+            amount: this.transactionData.amount!,
+            // transaction_type: this.transactionData.transaction_type,
+            payment_method: this.transactionData.payment_method
+          }
+        : null,
+      buyerId: isSoldOrRented ? this.selectedUserId : null
+    };
+
+    this.apiService.updateApartmentStatusWithTransaction(this.apartment.id, payload).subscribe({
+      next: () => {
+        alert('Apartment status, transaction, and buyer updated successfully.');
+        this.fetchApartmentDetails(this.apartment.id);
+        this.resetTransactionData();
+        this.selectedUserId = null;
+      },
+      error: () => alert('Failed to update apartment status and transaction.')
+    });
+  }
+
+  resetTransactionData(): void {
+    this.transactionData = {
+      amount: null,
+      // transaction_type: 'Rent',
+      payment_method: 'Visa'
+    };
+  }
+
+  detachBuyerTenant(): void {
+    if (!this.apartment) return;
+
+    this.apiService.removeApartmentBuyer(this.apartment.id).subscribe({
+      next: () => {
+        alert('Buyer/Tenant detached');
+        this.fetchApartmentDetails(this.apartment.id);
+      },
+      error: () => alert('Failed to detach buyer/tenant')
     });
   }
 
@@ -79,24 +159,16 @@ export class ApartmentDetailsComponent implements OnInit {
 
   contactOwner(apartmentId: number): void {
     if (this.isLoggedIn) {
-      this.router.navigate([`/contact-owner/${apartmentId}`]);
-      return;
+      this.router.navigate([`/tenant-dashboard/messages?apartmentId=${apartmentId}`]);
+    } else {
+      const dialogRef = this.dialog.open(ContactLoginPromptComponent);
+      dialogRef.afterClosed().subscribe(choice => {
+        if (choice === 'login') {
+          this.router.navigate(['/login'], { queryParams: { redirectTo: `/tenant-dashboard/messages?apartmentId=${apartmentId}` } });
+        } else if (choice === 'signup') {
+          this.router.navigate(['/signup'], { queryParams: { redirectTo: `/tenant-dashboard/messages?apartmentId=${apartmentId}`, forcedRole: 'Buyer/Tenant' } });
+        }
+      });
     }
-
-    const dialogRef = this.dialog.open(ContactLoginPromptComponent);
-
-    dialogRef.afterClosed().subscribe(choice => {
-      if (choice === 'login') {
-        this.router.navigate(['/login'], { queryParams: { redirectTo: `/tenant-dashboard/messages?apartmentId=${apartmentId}` } });
-      } else if (choice === 'signup') {
-        this.router.navigate(['/signup'], { queryParams: { redirectTo: `/contact-owner/${apartmentId}` } });
-      }
-      // cancel = do nothing
-    });
   }
-
-  // openContactForm(): void {
-  //   console.log('✅ Opening contact form...');
-  //   // TODO: Implement modal or form for contacting the owner
-  // }
 }

@@ -58,12 +58,12 @@ export class LoginComponent {
     this.isLoggingIn = true;
     this.errorMessage = '';
   
-    this.http.post<{ user: User }>('http://localhost:5000/api/login', {
+    this.http.post<{ user: User ,token: string}>('http://localhost:5000/api/login', {
       email: this.username,
       password: this.password
     }).subscribe({
       next: (res) => {
-        this.authService.login(res.user);
+        this.authService.login(res.user, res.token);
         this.currentUser.set(res.user);
   
         if (res.user.role === 'Technician') {
